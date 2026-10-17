@@ -127,6 +127,9 @@ body.simmode .stage { padding: 8px 8px 8px; }
 .tab { font: inherit; font-size: 13px; font-weight: 700; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--line); background: transparent; color: var(--fg); cursor: pointer; }
 .tab[aria-selected="true"] { background: var(--accent); border-color: var(--accent); color: var(--surface); }
 .diagram { width: 100%; height: auto; display: block; }
+/* 図の左右が前・後ろ（図の中の文字はスマホでは小さすぎるので、図の外に） */
+.ends { display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; color: var(--muted); margin-top: -4px; }
+body.simmode .ends { display: none; }
 .progress { height: 4px; background: var(--line); border-radius: 4px; overflow: hidden; }
 .progress i { display: block; height: 100%; background: var(--accent); width: 0; transition: width .4s; }
 .card { display: grid; gap: 10px; }
@@ -205,6 +208,7 @@ body.simmode .stage { padding: 8px 8px 8px; }
     <div class="tabs" role="tablist" id="tabs"></div>
     <div class="simmsg" id="simMsg" hidden aria-live="polite"><p class="why" id="simWhy"></p><p class="res" id="simRes1"></p><p class="res" id="simRes2"></p></div>
     <svg class="diagram" id="truck" viewBox="0 110 2000 702" preserveAspectRatio="xMidYMid meet" role="img" aria-label="トラックを助手席側（左）から見た図。左が運転席、右が後ろ"></svg>
+    <div class="ends" aria-hidden="true"><span>← 前（運転席）</span><span>後ろ →</span></div>
     <div class="progress" aria-hidden="true"><i id="bar"></i></div>
     <div class="nav">
       <button class="btn" id="prev" type="button">← 前へ</button>
@@ -582,29 +586,32 @@ const IS_IMG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAyAAAADzCAYAAAB+Mn
     if (st.clear > .5 && lowCar) {
       const x = 1000, top = lowCar.top + 2, f = (x - g.deck.x1) / DECK_L, deckY = onDeck(g, f).y + deckThick(f);
       el('line', { x1: x, y1: deckY, x2: x, y2: top, stroke: C.accent, 'stroke-width': 3, 'marker-start': 'url(#ah)', 'marker-end': 'url(#ah)' }, svg);
-      const t = el('text', { x: x + 14, y: (deckY + top) / 2 + 6, 'font-size': 18, 'font-weight': 700, fill: C.accent }, svg); t.textContent = 'すき間';
+      const t = el('text', { x: x + 14, y: (deckY + top) / 2 + 6, 'font-size': 76, 'font-weight': 900, fill: C.accent }, svg); t.textContent = 'すき間';
     }
     if (st.height > .5 && upCar) {
       const top = upCar.top;
       el('line', { x1: 20, y1: top, x2: 1300, y2: top, stroke: C.accent, 'stroke-width': 1.5, 'stroke-dasharray': '6 4' }, svg);
       el('line', { x1: 30, y1: G, x2: 30, y2: top, stroke: C.accent, 'stroke-width': 3, 'marker-start': 'url(#ah)', 'marker-end': 'url(#ah)' }, svg);
-      const t = el('text', { x: 44, y: top - 10, 'font-size': 18, 'font-weight': 700, fill: C.accent }, svg); t.textContent = '荷姿の高さ（地面から）';
+      const t = el('text', { x: 44, y: top - 16, 'font-size': 72, 'font-weight': 900, fill: C.accent }, svg); t.textContent = '荷姿の高さ（地面から）';
     }
     if (st.slide > .5 && upCar) {
-      const t = el('text', { x: upCar.wheels[0].x - 10, y: upCar.top - 18, 'text-anchor': 'middle', 'font-size': 20, 'font-weight': 900, fill: C.danger }, svg); t.textContent = '← キャビン側へ下がる！';
+      const t = el('text', { x: upCar.wheels[0].x - 10, y: upCar.top - 18, 'text-anchor': 'middle', 'font-size': 72, 'font-weight': 900, fill: C.danger }, svg); t.textContent = '← キャビン側へ下がる！';
     }
     // 上段の車の後ろ（床の角・屋根の角）がキャビンの後ろの壁より前に来たら「当たる」（フロアがキャビン側に下がって傾くと屋根の角が寄る）
     if (!simMode && upCar && carP.up >= 1) {
       const hp = upCarRearHit(g, st.crash * -93 + st.slide * -64 + (st.slidePx || 0));
       if (st.crash > .5 || hp.x <= CAB_X) {
         el('circle', { cx: Math.min(hp.x, CAB_X) + 4, cy: hp.y, r: 34, fill: 'none', stroke: C.danger, 'stroke-width': 10 }, svg);
-        const t = el('text', { x: CAB_X + 60, y: Math.min(hp.y, upCar.top) - 14, 'font-size': 22, 'font-weight': 900, fill: C.danger }, svg); t.textContent = 'キャビンに当たる！（前下がりにしすぎない・もう少し後ろに止める）';
+        // スマホでも読めるように 2 行に分けて大きく（図は約 1/3 に縮んで見える）
+        const ty = Math.min(hp.y, upCar.top) - 14;
+        const t = el('text', { x: CAB_X + 60, y: ty - 58, 'font-size': 72, 'font-weight': 900, fill: C.danger }, svg); t.textContent = 'キャビンに当たる！';
+        const t2 = el('text', { x: CAB_X + 60, y: ty, 'font-size': 50, 'font-weight': 700, fill: C.danger }, svg); t2.textContent = '前下がりにしすぎない・もう少し後ろに止める';
       }
     }
 
     if (!simMode && lowCar && carP.low >= 1) {
       const hp = lowCarHitsDeck(g, st.slidePx2 || 0, st.hop2 || 0);
-      if (hp) { el('circle', { cx: hp.x, cy: hp.y, r: 34, fill: 'none', stroke: C.danger, 'stroke-width': 10 }, svg); const t = el('text', { x: hp.x + 44, y: hp.y - 30, 'font-size': 22, 'font-weight': 900, fill: C.danger }, svg); t.textContent = '下段の車に当たる！'; }
+      if (hp) { el('circle', { cx: hp.x, cy: hp.y, r: 34, fill: 'none', stroke: C.danger, 'stroke-width': 10 }, svg); const t = el('text', { x: hp.x + 44, y: hp.y - 30, 'font-size': 72, 'font-weight': 900, fill: C.danger }, svg); t.textContent = '下段の車に当たる！'; }
     }
 
     // ── 手順：緊締した車輪を押すと拡大の小窓（引く向きを試せる）──
@@ -622,7 +629,7 @@ const IS_IMG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAyAAAADzCAYAAAB+Mn
         el('path', { d: `M${ax + sx * L},${ay + L} L${ax + sx * 14},${ay + 14}`, stroke: C.danger, 'stroke-width': 12, 'stroke-linecap': 'round', fill: 'none' }, mark);
         el('path', { d: `M${ax + sx * 2},${ay + 2} L${ax + sx * 50},${ay + 14} L${ax + sx * 14},${ay + 50} Z`, fill: C.danger }, mark);
         // 矢印の根元の外側に「TAP！」（白い縁どりで、図の上でも読めるように）
-        const tap = el('text', { x: ax + sx * (L + 12), y: ay + L + 18, 'text-anchor': i === 0 ? 'end' : 'start', 'font-size': 52, 'font-weight': 900, fill: C.danger,
+        const tap = el('text', { x: ax + sx * (L + 12), y: ay + L + 26, 'text-anchor': i === 0 ? 'end' : 'start', 'font-size': 80, 'font-weight': 900, fill: C.danger,
                                  stroke: '#FFFFFF', 'stroke-width': 8, 'paint-order': 'stroke', 'stroke-linejoin': 'round' }, mark);
         tap.textContent = 'TAP！';
       }
@@ -631,15 +638,19 @@ const IS_IMG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAyAAAADzCAYAAAB+Mn
       c.addEventListener('click', () => openZoom(car, i));
     });
     // ── 今さわるところ ──
-    const hi = simMode ? null : S[idx].hi;
+    // 緊締の手順は TAP！の印（下）で示すので、赤丸は出さない（重なってごちゃつくため）
+    const hi = simMode || S[idx].hi === 'wireU' || S[idx].hi === 'wireL' ? null : S[idx].hi;
     const spots = { cab: [150, 500], lock: [g.hinge.x + (g.L - 140) * Math.cos(g.a), g.hinge.y + (g.L - 140) * Math.sin(g.a)], gsw: [1250, lowerFloorY(1250, g) + FLOOR_T + 18], plate: [g.tip.x + 30 * Math.cos(g.a), g.tip.y - 10], chockU: [onDeck(g, .06).x, onDeck(g, .06).y - 12], fsw: [372, 605 + sh(372)], pins: [pF.x, pF.y], wireU: upCar ? [upCar.wheels[1].x, upCar.wheels[1].y] : null, wireL: lowCar ? [lowCar.wheels[1].x, lowCar.wheels[1].y] : null, slope: [1200, 672 + sh(1200)], clear: [1000, 430], height: [30, 300] };
     const sp = hi && spots[hi];
     if (sp) {
-      const ring = el('circle', { cx: sp[0], cy: sp[1], r: 22, fill: 'none', stroke: C.danger, 'stroke-width': 10 }, svg);
-      if (!reduce) { el('animate', { attributeName: 'r', values: '16;30;16', dur: '1.4s', repeatCount: 'indefinite' }, ring); el('animate', { attributeName: 'opacity', values: '1;.6;1', dur: '1.4s', repeatCount: 'indefinite' }, ring); }
+      // 今さわるところ：大きな丸が、今の丸の位置へ縮んでいくのを繰り返す（スマホでも目に入るように。10/17 本人）
+      el('circle', { cx: sp[0], cy: sp[1], r: 30, fill: 'none', stroke: C.danger, 'stroke-width': 10 }, svg);
+      if (!reduce) {
+        const ring = el('circle', { cx: sp[0], cy: sp[1], r: 30, fill: 'none', stroke: C.danger, 'stroke-width': 12, 'pointer-events': 'none' }, svg);
+        el('animate', { attributeName: 'r', values: '190;30', keyTimes: '0;1', calcMode: 'spline', keySplines: '.4 0 .9 .6', dur: '1.2s', repeatCount: 'indefinite' }, ring);
+        el('animate', { attributeName: 'opacity', values: '.25;1', dur: '1.2s', repeatCount: 'indefinite' }, ring);
+      }
     }
-    const lab = (x, y, s) => { const t = el('text', { x, y, 'text-anchor': 'middle', 'font-size': 15, fill: C.muted }, svg); t.textContent = s; };
-    lab(130, 804, '前（運転席）'); lab(simMode ? 1380 : 1620, 804, '後ろ');
     if (simMode && simView) {
       const world = el('g', { transform: `rotate(${(simView.theta * 180 / Math.PI).toFixed(3)},720,${G}) translate(0,${simView.shake.toFixed(2)})` });
       while (svg.firstChild) world.appendChild(svg.firstChild);
