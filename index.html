@@ -284,14 +284,14 @@ const IS_IMG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAyAAAADzCAYAAAB+Mn
       p: '上段フロアは前と後ろの油圧シリンダーで角度を変えられます。<b>後ろから、前と後ろを交互に少しずつ</b>上げます。',
       warn: ['後ろだけ上げない', '後ろだけ上げると、上段の車が前に傾いて<b>キャビンに当たります</b>。下の「後ろだけ上げると？」で見られます。'],
       tip: '全部上げると、緊締のときに手が届かなくなることがあります。高さは自分の届くところで止めます。' },
-    { ph: 1, t: '安全ピンを挿す', where: '上段フロアの柱', hi: 'pins', s: { pto: 1, sus: 0, gate: 1, plate: 1, up: 1, upF: .5, upR: .6, pin: 1 },
-      p: 'もしものときにフロアが落ちないよう、上げたら<b>安全ピン</b>を挿します。' },
+    { ph: 1, t: '安全ピンを挿す', where: '上段フロアの柱と油圧シリンダー', hi: 'pins', s: { pto: 1, sus: 0, gate: 1, plate: 1, up: 1, upF: .5, upR: .6, pin: 1 },
+      p: 'もしものときにフロアが落ちないよう、上げたら<b>安全ピン</b>を挿します。前の<b>柱の穴</b>と後ろの<b>油圧シリンダー</b>に、それぞれ<b>左右</b>。<b>前後左右の 4 か所</b>です（図は助手席側から見ているので、前と後ろの 2 か所だけ見えます）。' },
     { ph: 1, t: '上段の車を 4 か所で緊締する', where: '下段フロアに上がって', hi: 'wireU', s: { pto: 1, sus: 0, gate: 1, plate: 1, up: 1, upF: .5, upR: .6, pin: 1, wU: 1 },
       p: 'フロアに張ってあるワイヤーのフックを、車の穴（鉄板が二重の専用の穴）やフック用のプレートに掛けて、手動の巻き取り機（<b>ガッチャ</b>）で張ります。',
       tip: '上段は走るときにキャビン側を下げて傾けるので、車はキャビン側へ下がろうとします。ゲート側の車輪はフックを車輪より<b>ゲート側（後ろ）</b>に掛けて後ろへ引き、キャビン側の車輪は<b>真下引き</b>にします。上の「緊締を試す」でも確かめられます。' },
 
     { ph: 2, t: '上段を最大まで上げて、安全ピンを挿す', where: 'フロア操作スイッチ', hi: 'pins', s: { pto: 1, sus: 0, gate: 1, plate: 1, up: 1, upF: 1, upR: 1, pin: 1, wU: 1 },
-      p: '下段に積む前に、上段フロアを最大まで上げて安全ピンを挿し、下段の輪止めの位置を確かめます。' },
+      p: '下段に積む前に、上段フロアを最大まで上げて安全ピン（柱の穴と油圧シリンダーの<b>前後左右 4 か所</b>）を挿し、下段の輪止めの位置を確かめます。' },
     { ph: 2, t: 'すき間が厳しい車は、前を中くらいに', where: 'フロア操作スイッチ', hi: 'fsw', s: { pto: 1, sus: 0, gate: 1, plate: 1, up: 1, upF: .45, upR: 1, pin: 1, wU: 1 },
       p: '車種によっては上段フロアとのすき間が厳しいので、<b>前を中くらい・後ろを全上げ</b>などにして、すき間を作ります。' },
     { ph: 2, t: '下段に車を積む', where: '下段フロア', hi: null, s: { pto: 1, sus: 0, gate: 1, plate: 1, up: 1, upF: .45, upR: 1, pin: 1, wU: 1, low: 1 }, drive: 'low',
@@ -642,9 +642,10 @@ const IS_IMG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAyAAAADzCAYAAAB+Mn
     // ── 今さわるところ ──
     // 緊締の手順は TAP！の印（下）で示すので、赤丸は出さない（重なってごちゃつくため）
     const hi = simMode || S[idx].hi === 'wireU' || S[idx].hi === 'wireL' ? null : S[idx].hi;
-    const spots = { cab: [150, 500], lock: [g.hinge.x + (g.L - 140) * Math.cos(g.a), g.hinge.y + (g.L - 140) * Math.sin(g.a)], gsw: [1250, lowerFloorY(1250, g) + FLOOR_T + 18], plate: [g.tip.x + 30 * Math.cos(g.a), g.tip.y - 10], chockU: [onDeck(g, .06).x, onDeck(g, .06).y - 12], fsw: [372, 605 + sh(372)], pins: [pF.x, pF.y], wireU: upCar ? [upCar.wheels[1].x, upCar.wheels[1].y] : null, wireL: lowCar ? [lowCar.wheels[1].x, lowCar.wheels[1].y] : null, slope: [1200, 672 + sh(1200)], clear: [1000, 430], height: [30, 300] };
-    const sp = hi && spots[hi];
-    if (sp) {
+    const spots = { cab: [150, 500], lock: [g.hinge.x + (g.L - 140) * Math.cos(g.a), g.hinge.y + (g.L - 140) * Math.sin(g.a)], gsw: [1250, lowerFloorY(1250, g) + FLOOR_T + 18], plate: [g.tip.x + 30 * Math.cos(g.a), g.tip.y - 10], chockU: [onDeck(g, .06).x, onDeck(g, .06).y - 12], fsw: [372, 605 + sh(372)], pins: [[pF.x, pF.y], [pR.x, pR.y]], wireU: upCar ? [upCar.wheels[1].x, upCar.wheels[1].y] : null, wireL: lowCar ? [lowCar.wheels[1].x, lowCar.wheels[1].y] : null, slope: [1200, 672 + sh(1200)], clear: [1000, 430], height: [30, 300] };
+    const sp0 = hi && spots[hi];
+    // 2 か所以上のとき（安全ピン＝前の柱の穴と後ろの油圧シリンダー。左右にもあるので 4 か所）は、それぞれに丸を出す
+    for (const sp of !sp0 ? [] : Array.isArray(sp0[0]) ? sp0 : [sp0]) {
       // 今さわるところ：大きな丸が、今の丸の位置へ縮んでいくのを繰り返す（スマホでも目に入るように。10/17 本人）
       // 縮んでいく丸だけ（止まった丸は出さない。10/17 本人）。動きを減らす設定の人には、止まった丸を 1 つ
       if (reduce) el('circle', { cx: sp[0], cy: sp[1], r: 30, fill: 'none', stroke: C.danger, 'stroke-width': 10 }, svg);
