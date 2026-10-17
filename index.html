@@ -644,8 +644,9 @@ const IS_IMG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAyAAAADzCAYAAAB+Mn
     const sp = hi && spots[hi];
     if (sp) {
       // 今さわるところ：大きな丸が、今の丸の位置へ縮んでいくのを繰り返す（スマホでも目に入るように。10/17 本人）
-      el('circle', { cx: sp[0], cy: sp[1], r: 30, fill: 'none', stroke: C.danger, 'stroke-width': 10 }, svg);
-      if (!reduce) {
+      // 縮んでいく丸だけ（止まった丸は出さない。10/17 本人）。動きを減らす設定の人には、止まった丸を 1 つ
+      if (reduce) el('circle', { cx: sp[0], cy: sp[1], r: 30, fill: 'none', stroke: C.danger, 'stroke-width': 10 }, svg);
+      else {
         const ring = el('circle', { cx: sp[0], cy: sp[1], r: 30, fill: 'none', stroke: C.danger, 'stroke-width': 12, 'pointer-events': 'none' }, svg);
         el('animate', { attributeName: 'r', values: '190;30', keyTimes: '0;1', calcMode: 'spline', keySplines: '.4 0 .9 .6', dur: '1.2s', repeatCount: 'indefinite' }, ring);
         el('animate', { attributeName: 'opacity', values: '.25;1', dur: '1.2s', repeatCount: 'indefinite' }, ring);
