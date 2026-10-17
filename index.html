@@ -127,6 +127,12 @@ body.simmode .stage { padding: 8px 8px 8px; }
 .tab { font: inherit; font-size: 13px; font-weight: 700; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--line); background: transparent; color: var(--fg); cursor: pointer; }
 .tab[aria-selected="true"] { background: var(--accent); border-color: var(--accent); color: var(--surface); }
 .diagram { width: 100%; height: auto; display: block; }
+/* 手順のカードの続きが画面の外にあるとき、下に出す（文が画面の端でちょうど切れると、続きに気付かないため。10/17 本人） */
+.more { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(14px + env(safe-area-inset-bottom, 0px)); z-index: 20;
+        font: inherit; font-size: 14px; font-weight: 900; padding: 10px 18px; border-radius: 999px; border: 0; cursor: pointer;
+        background: var(--accent); color: var(--surface); box-shadow: 0 6px 18px rgba(0,0,0,.25); white-space: nowrap; }
+@media (prefers-reduced-motion: no-preference) { .more { animation: morebob 1.6s ease-in-out infinite; } }
+@keyframes morebob { 50% { transform: translateX(-50%) translateY(4px); } }
 /* 図の左右が前・後ろ（図の中の文字はスマホでは小さすぎるので、図の外に） */
 .ends { display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; color: var(--muted); margin-top: -4px; }
 body.simmode .ends { display: none; }
@@ -218,6 +224,7 @@ body.simmode .ends { display: none; }
   </section>
 
   <section class="panel card" id="card" aria-live="polite"></section>
+  <button class="more" type="button" id="more" hidden>↓ 下に続きがあります</button>
   <section class="panel compact" id="simControls" aria-label="緊締を試す" hidden>
     <!-- 上段の緊締・下段の緊締は左右にスワイプして切りかえる（本人 10/16） -->
     <div class="ltabs" role="tablist" aria-label="緊締する車"><button class="ltab" type="button" role="tab" id="ltabUp" aria-selected="true">上段の車</button><button class="ltab" type="button" role="tab" id="ltabLow" aria-selected="false">下段の車</button></div>
@@ -1136,6 +1143,19 @@ const IS_IMG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAyAAAADzCAYAAAB+Mn
   document.getElementById('simRear').oninput = e => { simR = e.target.value / 100; floorTouched(); };
 
   go(0);
+
+  // ── 下に続きがあるときの知らせ ──
+  const more = document.getElementById('more');
+  function updateMore() {
+    const card = document.getElementById('card');
+    const hidden = document.body.classList.contains('simmode') || card.hidden || card.getBoundingClientRect().bottom <= innerHeight - 8;
+    more.hidden = hidden;
+  }
+  more.onclick = () => { const r = document.getElementById('card').getBoundingClientRect(); scrollBy({ top: r.bottom - innerHeight + 24, behavior: reduce ? 'auto' : 'smooth' }); };
+  addEventListener('scroll', updateMore, { passive: true });
+  addEventListener('resize', updateMore);
+  new ResizeObserver(updateMore).observe(document.getElementById('card'));
+  updateMore();
   // 手順と「緊締を試す」の切り替え（上下に並べると見にくいので別の画面に）
   function setMode(m) {
     const simOn = m === 'sim';
