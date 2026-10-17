@@ -462,6 +462,8 @@ const IS_IMG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAyAAAADzCAYAAAB+Mn
       }
     }
   }
+  // 今さわるところの丸を、手順を切り替えた時から始める（図の時計で何秒目か）
+  let ringBegin = 0;
   function render() {
     const svg = document.getElementById('truck');
     svg.textContent = '';
@@ -647,9 +649,10 @@ const IS_IMG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAyAAAADzCAYAAAB+Mn
       // 縮んでいく丸だけ（止まった丸は出さない。10/17 本人）。動きを減らす設定の人には、止まった丸を 1 つ
       if (reduce) el('circle', { cx: sp[0], cy: sp[1], r: 30, fill: 'none', stroke: C.danger, 'stroke-width': 10 }, svg);
       else {
-        const ring = el('circle', { cx: sp[0], cy: sp[1], r: 30, fill: 'none', stroke: C.danger, 'stroke-width': 12, 'pointer-events': 'none' }, svg);
-        el('animate', { attributeName: 'r', values: '190;30', keyTimes: '0;1', calcMode: 'spline', keySplines: '.4 0 .9 .6', dur: '1.2s', repeatCount: 'indefinite' }, ring);
-        el('animate', { attributeName: 'opacity', values: '.25;1', dur: '1.2s', repeatCount: 'indefinite' }, ring);
+        // 何も出ていない状態から始まり、最大の大きさで現れて縮み、消える。手順を切り替えるたびに最初から（ringBegin）
+        const ring = el('circle', { cx: sp[0], cy: sp[1], r: 190, opacity: 0, fill: 'none', stroke: C.danger, 'stroke-width': 12, 'pointer-events': 'none' }, svg);
+        el('animate', { attributeName: 'r', values: '190;30', keyTimes: '0;1', calcMode: 'spline', keySplines: '.4 0 .9 .6', begin: ringBegin + 's', dur: '1.2s', repeatCount: 'indefinite' }, ring);
+        el('animate', { attributeName: 'opacity', values: '0;.35;1;0', keyTimes: '0;.08;.9;1', begin: ringBegin + 's', dur: '1.2s', repeatCount: 'indefinite' }, ring);
       }
     }
     if (simMode && simView) {
@@ -799,6 +802,7 @@ const IS_IMG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAyAAAADzCAYAAAB+Mn
     }
   }
   function go(i) {
+    { const t = document.getElementById('truck'); ringBegin = t.getCurrentTime ? +t.getCurrentTime().toFixed(3) : 0; }
     closeZoom(); wireOv.up = [null, null]; wireOv.low = [null, null];
     const prevIdx = idx;
     idx = clamp(i, 0, S.length - 1);
