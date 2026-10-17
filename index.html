@@ -257,6 +257,8 @@ const IS_IMG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAyAAAADzCAYAAAB+Mn
   const base = { sus: 1, gate: 0, plate: 0, upF: 0, upR: 0, up: 0, low: 0, lowSlope: 0, pin: 0, wU: 0, wL: 0, pto: 0, clear: 0, height: 0, crash: 0, slide: 0, badWire: 0, slidePx: 0, hop: 0, lock: 1, slidePx2: 0, hop2: 0 };
   const PH = ['準備', '上段', '下段', '仕上げ'];
   const S = [
+    { ph: 0, t: '作業灯をつける', where: '運転席', hi: 'cab', s: {},
+      p: '荷扱いを始める前に、運転席で<b>作業灯</b>をつけます。作業灯と一緒に<b>ストロボ</b>も光るので、後ろから来る車に気付いてもらえて、<b>追突を防ぎます</b>。' },
     { ph: 0, t: 'PTO を入れる', where: '運転席', hi: 'cab', s: { pto: 1 },
       p: 'フロアを動かすには、運転席で <b>PTO スイッチを押して、クラッチを踏む</b>必要があります。' },
     { ph: 0, t: 'エアサスを全下げにする', where: '運転席', hi: 'cab', s: { pto: 1, sus: 0 },
