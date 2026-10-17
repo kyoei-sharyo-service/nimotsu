@@ -597,14 +597,14 @@ const IS_IMG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAyAAAADzCAYAAAB+Mn
     if (!simMode && upCar && carP.up >= 1) {
       const hp = upCarRearHit(g, st.crash * -93 + st.slide * -64 + (st.slidePx || 0));
       if (st.crash > .5 || hp.x <= CAB_X) {
-        el('circle', { cx: Math.min(hp.x, CAB_X) + 4, cy: hp.y, r: 34, fill: 'none', stroke: C.danger, 'stroke-width': 4 }, svg);
+        el('circle', { cx: Math.min(hp.x, CAB_X) + 4, cy: hp.y, r: 34, fill: 'none', stroke: C.danger, 'stroke-width': 10 }, svg);
         const t = el('text', { x: CAB_X + 60, y: Math.min(hp.y, upCar.top) - 14, 'font-size': 22, 'font-weight': 900, fill: C.danger }, svg); t.textContent = 'キャビンに当たる！（前下がりにしすぎない・もう少し後ろに止める）';
       }
     }
 
     if (!simMode && lowCar && carP.low >= 1) {
       const hp = lowCarHitsDeck(g, st.slidePx2 || 0, st.hop2 || 0);
-      if (hp) { el('circle', { cx: hp.x, cy: hp.y, r: 34, fill: 'none', stroke: C.danger, 'stroke-width': 4 }, svg); const t = el('text', { x: hp.x + 44, y: hp.y - 30, 'font-size': 22, 'font-weight': 900, fill: C.danger }, svg); t.textContent = '下段の車に当たる！'; }
+      if (hp) { el('circle', { cx: hp.x, cy: hp.y, r: 34, fill: 'none', stroke: C.danger, 'stroke-width': 10 }, svg); const t = el('text', { x: hp.x + 44, y: hp.y - 30, 'font-size': 22, 'font-weight': 900, fill: C.danger }, svg); t.textContent = '下段の車に当たる！'; }
     }
 
     // ── 手順：緊締した車輪を押すと拡大の小窓（引く向きを試せる）──
@@ -635,8 +635,8 @@ const IS_IMG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAyAAAADzCAYAAAB+Mn
     const spots = { cab: [150, 500], lock: [g.hinge.x + (g.L - 140) * Math.cos(g.a), g.hinge.y + (g.L - 140) * Math.sin(g.a)], gsw: [1250, lowerFloorY(1250, g) + FLOOR_T + 18], plate: [g.tip.x + 30 * Math.cos(g.a), g.tip.y - 10], chockU: [onDeck(g, .06).x, onDeck(g, .06).y - 12], fsw: [372, 605 + sh(372)], pins: [pF.x, pF.y], wireU: upCar ? [upCar.wheels[1].x, upCar.wheels[1].y] : null, wireL: lowCar ? [lowCar.wheels[1].x, lowCar.wheels[1].y] : null, slope: [1200, 672 + sh(1200)], clear: [1000, 430], height: [30, 300] };
     const sp = hi && spots[hi];
     if (sp) {
-      const ring = el('circle', { cx: sp[0], cy: sp[1], r: 22, fill: 'none', stroke: C.danger, 'stroke-width': 4 }, svg);
-      if (!reduce) { el('animate', { attributeName: 'r', values: '16;30;16', dur: '1.4s', repeatCount: 'indefinite' }, ring); el('animate', { attributeName: 'opacity', values: '1;.25;1', dur: '1.4s', repeatCount: 'indefinite' }, ring); }
+      const ring = el('circle', { cx: sp[0], cy: sp[1], r: 22, fill: 'none', stroke: C.danger, 'stroke-width': 10 }, svg);
+      if (!reduce) { el('animate', { attributeName: 'r', values: '16;30;16', dur: '1.4s', repeatCount: 'indefinite' }, ring); el('animate', { attributeName: 'opacity', values: '1;.6;1', dur: '1.4s', repeatCount: 'indefinite' }, ring); }
     }
     const lab = (x, y, s) => { const t = el('text', { x, y, 'text-anchor': 'middle', 'font-size': 15, fill: C.muted }, svg); t.textContent = s; };
     lab(130, 804, '前（運転席）'); lab(simMode ? 1380 : 1620, 804, '後ろ');
@@ -648,13 +648,13 @@ const IS_IMG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAyAAAADzCAYAAAB+Mn
       const r1 = document.getElementById('simRes1'), r2 = document.getElementById('simRes2');
       r1.textContent = simView.msg ? (simView.msg2 ? '上段：' : '') + simView.msg : ''; r1.classList.toggle('bad', !!simView.bad);
       r2.textContent = simView.msg2 || ''; r2.classList.toggle('bad', !!simView.bad2);
-      if (simView.hit2 === 'deck' && lowCar) { const p = simView.hitPt2 || { x: lowCar.wheels[0].x + 80, y: lowCar.top + 8 }; el('circle', { cx: p.x, cy: p.y, r: 30, fill: 'none', stroke: C.danger, 'stroke-width': 4 }, svg); }
-      if (simView.hit2 === 'column' && lowCar) el('circle', { cx: COL.x2 + 10, cy: lowCar.top + 40, r: 30, fill: 'none', stroke: C.danger, 'stroke-width': 4 }, svg);
-      if (simView.hit === 'cab' && upCar) { const p = simView.hitPt || { x: CAB_X, y: upCar.top + 50 }; el('circle', { cx: Math.min(p.x, CAB_X) + 4, cy: p.y, r: 34, fill: 'none', stroke: C.danger, 'stroke-width': 4 }, svg); }
-      if (simView.hit === 'column' && upCar) el('circle', { cx: COL.x2 + 6, cy: upCar.wheels[0].y - 30, r: 30, fill: 'none', stroke: C.danger, 'stroke-width': 4 }, svg);
-      if (simView.hit === 'derail' && upCar) { const w = upCar.wheels.slice().sort((a, b) => b.x - a.x)[0]; el('circle', { cx: w.x, cy: w.y, r: 34, fill: 'none', stroke: C.danger, 'stroke-width': 4 }, svg); }
-      if (simView.hit === 'gate' && upCar) el('circle', { cx: g.hinge.x - 10, cy: upCar.wheels[1].y - 20, r: 30, fill: 'none', stroke: C.danger, 'stroke-width': 4 }, svg);
-      if (simView.hit2 === 'gate' && lowCar) el('circle', { cx: g.hinge.x - 10, cy: lowCar.top + 60, r: 30, fill: 'none', stroke: C.danger, 'stroke-width': 4 }, svg);
+      if (simView.hit2 === 'deck' && lowCar) { const p = simView.hitPt2 || { x: lowCar.wheels[0].x + 80, y: lowCar.top + 8 }; el('circle', { cx: p.x, cy: p.y, r: 30, fill: 'none', stroke: C.danger, 'stroke-width': 10 }, svg); }
+      if (simView.hit2 === 'column' && lowCar) el('circle', { cx: COL.x2 + 10, cy: lowCar.top + 40, r: 30, fill: 'none', stroke: C.danger, 'stroke-width': 10 }, svg);
+      if (simView.hit === 'cab' && upCar) { const p = simView.hitPt || { x: CAB_X, y: upCar.top + 50 }; el('circle', { cx: Math.min(p.x, CAB_X) + 4, cy: p.y, r: 34, fill: 'none', stroke: C.danger, 'stroke-width': 10 }, svg); }
+      if (simView.hit === 'column' && upCar) el('circle', { cx: COL.x2 + 6, cy: upCar.wheels[0].y - 30, r: 30, fill: 'none', stroke: C.danger, 'stroke-width': 10 }, svg);
+      if (simView.hit === 'derail' && upCar) { const w = upCar.wheels.slice().sort((a, b) => b.x - a.x)[0]; el('circle', { cx: w.x, cy: w.y, r: 34, fill: 'none', stroke: C.danger, 'stroke-width': 10 }, svg); }
+      if (simView.hit === 'gate' && upCar) el('circle', { cx: g.hinge.x - 10, cy: upCar.wheels[1].y - 20, r: 30, fill: 'none', stroke: C.danger, 'stroke-width': 10 }, svg);
+      if (simView.hit2 === 'gate' && lowCar) el('circle', { cx: g.hinge.x - 10, cy: lowCar.top + 60, r: 30, fill: 'none', stroke: C.danger, 'stroke-width': 10 }, svg);
     }
   }
 
