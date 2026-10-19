@@ -53,6 +53,7 @@
 html, body, button, input, label, .chip, .btn, .tab { touch-action: manipulation; }
 body {
   background: var(--bg); color: var(--fg); font-family: var(--font); font-size: 15px; line-height: 1.75;
+  line-break: strict;   /* 「ワイヤ／ー」「ショ／ン」のように、伸ばす音や小さい文字の前で折り返さない */
   padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
   padding-block: 20px 48px;
 }
@@ -74,9 +75,6 @@ h2 { font-size: 20px; margin: 0; font-weight: 900; text-wrap: balance; }
 .compact .chips { gap: 5px; }
 .compact .btn { font-size: 13px; padding: 7px 12px; }
 body.simmode header, body.simmode .lead { display: none; }
-body.fixedpage.simmode .compact .chip { font-size: 11px; padding: 4px 7px; }
-body.fixedpage.simmode .lrow { grid-template-columns: 5.6em 1fr; gap: 4px; }
-body.fixedpage.simmode .lk { font-size: 10px; }
 body.fixedpage.simmode .vbox { height: 100px; }
 body.fixedpage.simmode .vbox input { width: 100px; }
 body.fixedpage.simmode .compact { gap: 4px; padding: 8px 10px; }
@@ -85,7 +83,7 @@ body.fixedpage { padding-block: 8px 24px; }
 /* 緊締を試す（アプリ・Web の「緊締について」）：ゲームの画面のように、画面にぴったり収めてスクロールさせない。
    図が残りの高さいっぱいに伸び縮みし、操作は下に固定。縦スライダーを動かしてもページが動かない（2026-10-16 本人） */
 html:has(body.fixedpage.simmode), body.fixedpage.simmode { height: 100%; overflow: hidden; overscroll-behavior: none; }
-body.fixedpage.simmode { padding-block: 4px 0; padding-bottom: max(6px, env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; }
+body.fixedpage.simmode { margin: 0; padding-block: 4px 0; padding-bottom: max(6px, env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; }
 /* 上：結果の文（高さ固定。文が変わっても下が動かない）＋図（横幅いっぱい・縦横比どおり）。下：操作（残りの高さいっぱい、大きいボタン）（本人 10/16） */
 body.fixedpage.simmode .wrap { flex: 1 1 auto; min-height: 0; display: grid; grid-template-rows: auto minmax(0, 1fr); gap: 6px; width: 100%; }
 body.fixedpage.simmode .stage { position: static; box-shadow: none; display: grid; gap: 0; background: transparent; border-color: transparent; padding: 0 2px; }
@@ -96,11 +94,11 @@ body.fixedpage.simmode .simmsg .why { font-size: 12px; }
 body.fixedpage.simmode .simmsg .res { font-size: 14px; line-height: 1.3; }
 body.fixedpage.simmode .simmsg .res:empty { display: none; }
 body.fixedpage.simmode .compact { min-height: 0; display: flex; flex-direction: column; gap: 6px; padding: 8px 8px; }
-body.fixedpage.simmode .lrow { grid-template-columns: 3.6em 1fr; gap: 4px; }
-body.fixedpage.simmode .lk { font-size: 11px; white-space: normal; line-height: 1.2; }
-body.fixedpage.simmode .compact .chips { gap: 4px; flex-wrap: nowrap; }
-body.fixedpage.simmode .compact .chip { font-size: 13.5px; padding: 6px 0; min-height: 36px; flex: 1 1 0; min-width: 0; text-align: center; white-space: nowrap; letter-spacing: -.02em; border-radius: 12px; }
-body.fixedpage.simmode #lowToggle { flex: 0 1 auto; padding: 9px 16px; }
+body.simmode .lrow { grid-template-columns: 3.6em minmax(0, 1fr); gap: 4px; }
+body.simmode .lk { font-size: 11px; white-space: normal; line-height: 1.2; }
+body.simmode .compact .chips { gap: 4px; flex-wrap: nowrap; }
+body.simmode .compact .chip { font-size: 13.5px; padding: 6px 0; min-height: 36px; flex: 1 1 0; min-width: 0; text-align: center; white-space: nowrap; letter-spacing: -.02em; border-radius: 12px; }
+body.simmode #lowToggle { flex: 0 1 auto; padding: 9px 16px; }
 body.fixedpage.simmode .compact .btn { font-size: 14px; padding: 12px 14px; border-radius: 14px; white-space: nowrap; }
 body.fixedpage.simmode .vrow { flex: 1 1 0; min-height: 120px; align-items: stretch; padding-top: 2px; }
 body.fixedpage.simmode .vslider { width: 64px; font-size: 12px; gap: 4px; grid-template-rows: 1fr auto; }
@@ -115,6 +113,8 @@ body.simmode .stage { padding: 8px 8px 8px; }
 /* 緊締を試す：結果の文（図の上。読める大きさで） */
 .simmsg { display: flex; flex-direction: column; gap: 2px; text-align: center; line-height: 1.35; padding: 2px 4px 0; min-height: 4.2em; justify-content: flex-end; }
 .simmsg p { margin: 0; }
+/* 結果の文：言葉の切れ目（、。！？）の後ろと（の前）でだけ折り返す（「効い／ている」のように切れないように。10/19 本人） */
+.ph { display: inline-block; max-width: 100%; }
 .simmsg .why { font-size: 13px; font-weight: 700; color: var(--muted); }
 .simmsg .res { white-space: pre-line; font-size: 17px; font-weight: 900; color: var(--accent); }
 .simmsg .res.bad { color: var(--danger); }
@@ -123,7 +123,7 @@ body.simmode .stage { padding: 8px 8px 8px; }
 .vslider { display: grid; justify-items: center; gap: 4px; font-size: 11px; font-weight: 700; color: var(--muted); width: 44px; flex: none; }
 .vbox { position: relative; width: 44px; height: 140px; }
 .vbox input { position: absolute; left: 50%; top: 50%; width: 140px; height: 44px; margin: 0; transform: translate(-50%, -50%) rotate(-90deg); accent-color: var(--accent); }
-.mode .tab { flex: 1; text-align: center; padding: 9px 12px; font-size: 14px; }
+.mode .tab { flex: 1; text-align: center; padding: 9px 6px; font-size: 14px; white-space: nowrap; }
 .tab { font: inherit; font-size: 13px; font-weight: 700; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--line); background: transparent; color: var(--fg); cursor: pointer; }
 .tab[aria-selected="true"] { background: var(--accent); border-color: var(--accent); color: var(--surface); }
 .diagram { width: 100%; height: auto; display: block; }
@@ -193,7 +193,7 @@ body.simmode .ends { display: none; }
 .zoomhd { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 15px; }
 .zoomhd .btn { padding: 6px 12px; font-size: 13px; }
 .zoomsvg { width: 100%; aspect-ratio: 240 / 150; background: var(--bg); border-radius: 12px; display: block; }
-.zoommsg { margin: 0; font-size: 13px; line-height: 1.5; font-weight: 700; color: var(--accent); }
+.zoommsg { white-space: pre-line; margin: 0; font-size: 13px; line-height: 1.5; font-weight: 700; color: var(--accent); }
 .zoommsg.bad { color: var(--danger); }
 /* 「なぜこれが〇〇なの？」（押すと、小学生でも分かる説明が開く） */
 .zoomwhy { justify-self: start; font: inherit; font-size: 14px; font-weight: 900; color: var(--danger); text-decoration: underline; text-underline-offset: 3px; background: none; border: 0; padding: 2px 0; cursor: pointer; }
@@ -201,6 +201,65 @@ body.simmode .ends { display: none; }
 .zoomexp p { margin: 0; }
 .zoombtns { display: grid !important; grid-template-columns: repeat(3, 1fr); gap: 6px; }
 .zoombtns .chip { font-size: 15px; padding: 12px 0; text-align: center; }
+.zoombox { max-height: 100%; overflow-y: auto; overscroll-behavior: contain; }
+/* ── タイヤ固縛（2026-10-19）── */
+/* 小窓の中の「反対側（奥）の車輪」の上から見た図 */
+.tzoomtop { width: 100%; height: auto; display: block; background: var(--bg); border-radius: 12px; }
+.tzoomtxt { margin: 0; font-size: 13px; line-height: 1.6; }
+/* 解説の画面（手順 12・18・小窓・タイヤ固縛編の「解説」から開く。戻るで元の画面へ） */
+.texp { position: fixed; inset: 0; z-index: 60; background: var(--bg); overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
+        padding: max(8px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(24px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
+.texpin { max-width: 760px; margin: 0 auto; display: grid; gap: 14px; }
+.texphd { position: sticky; top: 0; z-index: 1; display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 6px 0; background: var(--bg); }
+.texphd b { font-size: 17px; font-weight: 900; }
+body.fixedpage:not(.simmode):not(.tiremode) .texphd b { padding-left: 40px; }   /* アプリの手順：左上の戻るの丸ボタンと重ならないように */
+.texp h2 { font-size: 17px; }
+.texp p, .texp li { margin: 0; font-size: 14px; line-height: 1.7; }
+.texp ul { margin: 0; padding-left: 1.2em; display: grid; gap: 4px; }
+.texp .cap { font-weight: 700; min-height: 3.4em; }
+.texp .figlabel { font-size: 12px; font-weight: 700; color: var(--muted); text-align: center; margin-top: -4px; }
+/* タイヤ固縛を試す */
+.tsim { position: relative; gap: 4px; padding: 8px 10px; }
+.tsim .simmsg { min-height: 0; justify-content: flex-start; text-align: left; }
+.tsim .simmsg .res { font-size: 16px; }
+.tsimbtn { flex: none; font-size: 12px; padding: 3px 12px; border-radius: 8px; margin-right: 8px; }
+.tnote { margin: 0; font-size: 12.5px; line-height: 1.55; color: var(--fg); }
+.tnote b { color: var(--accent); }
+.tnote .sub { display: block; color: var(--muted); margin-top: 2px; }
+.twin { display: grid; gap: 6px; }
+.compact .demo .btn { white-space: nowrap; }
+html:has(body.fixedpage.tiremode), body.fixedpage.tiremode { height: 100%; overflow: hidden; overscroll-behavior: none; }
+body.fixedpage.tiremode { margin: 0; padding-block: 4px 0; padding-bottom: max(6px, env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; }
+body.fixedpage.tiremode .wrap { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; gap: 6px; width: 100%; }
+body.fixedpage.tiremode .tsim { flex: 1 1 auto; min-height: 0; overflow: hidden; }
+body.fixedpage.tiremode #tireControls { flex: none; }
+/* 図（上から・横から）は残りの高さに合わせて縮む。説明の文は図の下 */
+body.fixedpage.tiremode .tsim { display: flex; flex-direction: column; }
+body.fixedpage.tiremode .twin { flex: 1 1 0; min-height: 0; grid-template-rows: minmax(0, 1fr); gap: 2px; }
+body.fixedpage.tiremode .twin svg { width: 100%; height: 100%; min-height: 0; }
+body.fixedpage.tiremode .compact .btn { font-size: 14px; padding: 10px 6px; border-radius: 14px; }
+body.tiremode .compact .chips { gap: 4px; flex-wrap: nowrap; }
+body.tiremode .compact .chip { font-size: 13px; padding: 6px 0; min-height: 36px; flex: 1 1 0; min-width: 0; text-align: center; white-space: nowrap; letter-spacing: -.02em; border-radius: 12px; }
+body.tiremode .lrow { grid-template-columns: 3.6em minmax(0, 1fr); gap: 4px; }
+body.fixedpage.tiremode .simmsg .why { font-size: 12px; }
+body.fixedpage.tiremode .simmsg .res { font-size: 14px; line-height: 1.3; }
+body.fixedpage.tiremode .tnote { font-size: 12px; line-height: 1.45; }
+body.fixedpage.tiremode .compact { gap: 5px; padding: 8px; }
+body.tiremode .compact .chip.ev { font-size: 12px; letter-spacing: -.05em; }
+body.tiremode .lk { font-size: 11px; white-space: normal; line-height: 1.2; }
+body.tiremode header, body.tiremode .lead, body.tiremode .stage, body.tiremode #card { display: none !important; }
+/* 視点の切り替え（横から／上から）：図のすぐ上の右に（10/19 本人：操作の欄のいちばん下では気づかない） */
+.viewsw { display: flex; justify-content: flex-end; align-items: center; margin: 2px 0 4px; }
+.viewsw .vlabel { font-size: 11px; font-weight: 800; color: var(--muted); margin-right: 6px; white-space: nowrap; }
+.viewsw .seg { display: flex; flex: none; }
+.viewsw em { font-style: normal; font-size: 11px; font-weight: 700; color: var(--muted); margin-right: auto; white-space: nowrap; }
+.viewsw .seg button { font: inherit; font-size: 12px; font-weight: 800; padding: 3px 12px; border: 1.5px solid var(--accent); background: var(--surface); color: var(--accent); cursor: pointer; }
+.viewsw .seg button:first-of-type { border-radius: 8px 0 0 8px; }
+.viewsw .seg button:last-of-type { border-radius: 0 8px 8px 0; border-left: 0; }
+.viewsw .seg button[aria-pressed="true"] { background: var(--accent); color: var(--surface); }
+.viewsw .seg button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+/* 緊締を試す：走り方が 6 つになったので 2 行に。真ん中は「戻す」と「タイヤ固縛を試す」を縦に */
+.vmid { display: grid; gap: 6px; align-content: center; justify-items: stretch; }
 [hidden]{display:none!important}</style>
 </head>
 <body>
@@ -216,11 +275,13 @@ body.simmode .ends { display: none; }
   <div class="mode" role="tablist" aria-label="画面">
     <button class="tab" type="button" role="tab" id="modeSteps" aria-selected="true">手順</button>
     <button class="tab" type="button" role="tab" id="modeSim" aria-selected="false">緊締を試す</button>
+    <button class="tab" type="button" role="tab" id="modeTire" aria-selected="false">タイヤ固縛</button>
   </div>
 
   <section class="panel stage" aria-label="トラックの図">
     <div class="tabs" role="tablist" id="tabs"></div>
     <div class="simmsg" id="simMsg" hidden aria-live="polite"><p class="why" id="simWhy"></p><p class="res" id="simRes1"></p><p class="res" id="simRes2"></p></div>
+    <div class="viewsw" id="simViewSw" role="group" aria-label="視点" hidden><em>緊締のところを押すと拡大</em><span class="vlabel">視点</span><span class="seg"><button type="button" id="simViewSide" aria-pressed="true">横から</button><button type="button" id="simViewTop" aria-pressed="false">上から</button></span></div>
     <svg class="diagram" id="truck" viewBox="0 110 2000 702" preserveAspectRatio="xMidYMid meet" role="img" aria-label="トラックを助手席側（左）から見た図。左が運転席、右が後ろ"></svg>
     <div class="ends" aria-hidden="true"><span>← 前（運転席）</span><span>後ろ →</span></div>
     <div class="progress" aria-hidden="true"><i id="bar"></i></div>
@@ -249,12 +310,38 @@ body.simmode .ends { display: none; }
         <div class="lrow lowrow" hidden><span class="lk">シフト</span><div class="chips" id="shiftLow"></div></div>
       </div>
     </div>
-    <div class="lrow"><span class="lk">走る</span><div class="chips"><button class="chip" type="button" id="roadRough" aria-pressed="false">悪路</button><button class="chip ev" type="button" id="simBrake">急ブレーキ</button><button class="chip ev bad" type="button" id="simCrash">衝突</button></div></div>
+    <div class="lrow"><span class="lk">走る</span><div class="chips"><button class="chip" type="button" id="roadRough" aria-pressed="false">悪路</button><button class="chip ev" type="button" id="simBump">段差</button><button class="chip ev" type="button" id="simCurve">カーブ</button></div></div>
+    <div class="lrow"><span class="lk">急な動き</span><div class="chips"><button class="chip ev" type="button" id="simAccel">急加速</button><button class="chip ev" type="button" id="simBrake">急ブレーキ</button><button class="chip ev bad" type="button" id="simCrash">衝突</button></div></div>
     <div class="vrow">
       <div class="vslider" id="vsF"><div class="vbox"><input type="range" id="simFront" min="0" max="100" value="50" aria-label="上段フロアのキャビン側の高さ"></div><span>キャビン側</span></div>
-      <button class="btn" type="button" id="simAgain">車を元の位置に戻す</button>
+      <div class="vmid"><button class="btn" type="button" id="simAgain">車を元の位置に戻す</button><button class="btn" type="button" id="simToTire">タイヤ固縛を試す →</button></div>
       <div class="vslider" id="vsR"><div class="vbox"><input type="range" id="simRear" min="0" max="100" value="95" aria-label="上段フロアのゲート側の高さ"></div><span>ゲート側</span></div>
     </div>
+  </section>
+  <!-- タイヤ固縛を試す（2026-10-19）：上段・下段の車。見る＝横から（トラックの側面図）／上から（真上の図） -->
+  <section class="panel tsim" id="tireSim" aria-label="タイヤ固縛を試す" hidden>
+    <div class="simmsg" aria-live="polite"><p class="why" id="tWhy"></p><p class="res" id="tRes"></p><p class="res" id="tRes2"></p></div>
+    <div class="viewsw" role="group" aria-label="視点"><button class="btn tsimbtn" type="button" id="tExplain">解説</button><em>固縛を押すと拡大</em><span class="vlabel">視点</span><span class="seg"><button type="button" id="tViewSide" aria-pressed="false">横から</button><button type="button" id="tViewTop" aria-pressed="true">上から</button></span></div>
+    <div class="twin">
+      <svg class="diagram" id="tTop" viewBox="60 50 1320 460" role="img" aria-label="積載車と車を上から見た図。左がキャビン側、右がゲート側"></svg>
+      <svg class="diagram" id="tSide" viewBox="0 205 1480 607" role="img" aria-label="積載車を助手席側から見た図。左がキャビン側" hidden></svg>
+    </div>
+    <p class="tnote" id="tNote"></p>
+  </section>
+  <section class="panel compact" id="tireControls" aria-label="タイヤ固縛の操作" hidden>
+    <div class="ltabs" role="tablist" aria-label="固縛する車"><button class="ltab" type="button" role="tab" id="tLtabUp" aria-selected="true">上段の車</button><button class="ltab" type="button" role="tab" id="tLtabLow" aria-selected="false">下段の車</button></div>
+    <div class="lpages" id="tLpages">
+      <div class="lpage" aria-label="上段の車の固縛">
+        <div class="lrow"><span class="lk">固縛</span><div class="chips" id="tWheelsUp"></div></div>
+        <div class="lrow"><span class="lk">ワイヤー</span><div class="chips"><button class="chip" type="button" id="tWireUp" aria-pressed="false">ワイヤーも掛ける（車体）</button></div></div>
+      </div>
+      <div class="lpage" aria-label="下段の車の固縛">
+        <div class="lrow"><span class="lk">下段</span><div class="chips"><button class="chip" type="button" id="tLowToggle" aria-pressed="true">下段の車を下ろす</button><button class="chip tlowrow" type="button" id="tWireLow" aria-pressed="false">ワイヤーも掛ける</button></div></div>
+        <div class="lrow tlowrow"><span class="lk">固縛</span><div class="chips" id="tWheelsLow"></div></div>
+      </div>
+    </div>
+    <div class="lrow"><span class="lk">走る</span><div class="chips"><button class="chip ev" type="button" id="tBrake">急ブレーキ</button><button class="chip ev" type="button" id="tAccel">急加速</button><button class="chip ev" type="button" id="tCurve">カーブ</button><button class="chip ev" type="button" id="tBump">段差</button></div></div>
+    <div class="demo"><button class="btn" type="button" id="tAgain">車を元の位置に戻す</button><button class="btn" type="button" id="tToWire">← ワイヤー緊締を試す</button></div>
   </section>
 </div>
 
@@ -264,7 +351,10 @@ const BASE_IMG = 'nimotsu-truck.png';
 // 本人の車の絵から切り出したプロボックス（右が前）とレクサス IS（左が前）（art/carcut2.swift）
 const PROBOX_IMG = 'nimotsu-probox.png';
 const IS_IMG = 'nimotsu-is.png';
-for (const u of [BASE_IMG, PROBOX_IMG, IS_IMG]) { const im = new Image(); im.src = u; }
+// 真上から見た図（carrier-topview で作ったパーツ。2026-10-19 本人。1 m＝126 px の実寸、トラックの前の端が x=99・真ん中が y=258.5、どれも同じ 1418×517 の上に置く）
+const TOP_TRUCK = 'nimotsu-top-truck.png', TOP_RAMPS = 'nimotsu-top-ramps.png', TOP_PROBOX = 'nimotsu-top-probox.png', TOP_IS = 'nimotsu-top-is.png';
+// 絵は同じフォルダの PNG（2026-10-18 に HTML から分けた。ページを軽くするため）。先に読み込んでおく
+for (const u of [BASE_IMG, PROBOX_IMG, IS_IMG, TOP_TRUCK, TOP_RAMPS, TOP_PROBOX, TOP_IS]) { const im = new Image(); im.src = u; }
 (() => {
   const NS = 'http://www.w3.org/2000/svg';
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -452,18 +542,28 @@ for (const u of [BASE_IMG, PROBOX_IMG, IS_IMG]) { const im = new Image(); im.src
   // 車輪の間（px）・車軸の真ん中から前後の端まで（px）
   function carWbPx(kind, len) { const k = CAR[kind]; return Math.abs(k.wheels[1][0] - k.wheels[0][0]) * len / k.w; }
   // 車を描く。(x, y)＝前後の車軸の真ん中の地面の点、ang＝載っている面の角度、len＝長さ（px）、flip＝前を左（キャビン側）に向ける
-  function drawCar(parent, x, y, ang, color, len, kind = 'probox', flip = false) {
+  // split＝{ lift, hops }：ボディとタイヤを分けて描く（タイヤ固縛を試す。lift＝ボディの持ち上がり px、hops＝絵の車輪の順に跳ね px）
+  function drawCar(parent, x, y, ang, color, len, kind = 'probox', flip = false, split = null) {
     const k = CAR[kind], sc = len / k.w;
     const mirror = flip !== k.facesLeft;   // 絵の向きと、向けたい向きが違えば左右を返す
     const g = el('g', { transform: `translate(${x.toFixed(1)},${y.toFixed(1)}) rotate(${(ang * 180 / Math.PI).toFixed(2)}) scale(${(mirror ? -sc : sc).toFixed(4)},${sc.toFixed(4)})` }, parent);
     const mx = (k.wheels[0][0] + k.wheels[1][0]) / 2, gy = k.ground;
-    el('image', { href: k.img, x: -mx, y: -gy, width: k.w, height: k.h, preserveAspectRatio: 'none' }, g);
+    const im = { href: k.img, x: -mx, y: -gy, width: k.w, height: k.h, preserveAspectRatio: 'none' };
+    if (split) {
+      const id = 'tc-' + kind, R = k.r * 1.06, ring = (cx, cy) => `M${cx - R},${cy} a${R},${R} 0 1,0 ${2 * R},0 a${R},${R} 0 1,0 ${-2 * R},0`;
+      el('path', { d: `M${-mx},${-gy} h${k.w} v${k.h} h${-k.w} Z ` + k.wheels.map(w => ring(w[0] - mx, w[1] - gy)).join(' '), 'clip-rule': 'evenodd' }, el('clipPath', { id: id + 'b' }, g));
+      el('image', { ...im, 'clip-path': `url(#${id}b)` }, el('g', { transform: `translate(0,${(-split.lift / sc).toFixed(2)})` }, g));
+      k.wheels.forEach((w, i) => {
+        el('circle', { cx: w[0] - mx, cy: w[1] - gy, r: R }, el('clipPath', { id: id + 'w' + i }, g));
+        el('image', { ...im, 'clip-path': `url(#${id}w${i})` }, el('g', { transform: `translate(0,${(-(split.hops[i] || 0) / sc).toFixed(2)})` }, g));
+      });
+    } else el('image', im, g);
     const c = Math.cos(ang), s = Math.sin(ang), fx = mirror ? -1 : 1;
     const P = (lx, ly) => ({ x: x + (lx * fx * c - ly * s) * sc, y: y + (lx * fx * s + ly * c) * sc });
     const wheels = k.wheels.map(w => P(w[0] - mx, w[1] - gy));
     const hooks = k.hooks.map(h => P(h[0] - mx, h[1] - gy));
     const hookLocal = k.hooks.map(h => ({ along: (h[0] - mx) * (mirror ? -1 : 1) * sc, up: (gy - h[1]) * sc })).sort((a, b) => a.along - b.along);
-    return { g, wheels, hooks, hookLocal, top: P(0, -gy).y, wbPx: Math.abs(k.wheels[1][0] - k.wheels[0][0]) * sc, rPx: k.r * sc, hPx: gy * sc, sc };
+    return { g, ang, wheels, hooks, hookLocal, top: P(0, -gy).y, wbPx: Math.abs(k.wheels[1][0] - k.wheels[0][0]) * sc, rPx: k.r * sc, hPx: gy * sc, sc };
   }
 
   // フックの位置は車輪から見た距離（+ は後ろ・ゲート側）。両側に広げれば真下引き、片側に寄せればその向きに引く。
@@ -480,10 +580,13 @@ for (const u of [BASE_IMG, PROBOX_IMG, IS_IMG]) { const im = new Image(); im.src
   }
   // 今さわるところの丸を、手順を切り替えた時から始める（図の時計で何秒目か）
   let ringBegin = 0;
+  let renderTarget = null;   // タイヤ固縛を試すの横から見た図に描くとき（ふだんは手順・緊締を試すの図）
   function render() {
-    const svg = document.getElementById('truck');
+    const svg = renderTarget || document.getElementById('truck');
     svg.textContent = '';
+    tapTargets.set(svg, []);
     lastWheels = { up: null, low: null };
+    if (simMode && simTop && !renderTarget) { drawSimTop(svg); simTexts(); return; }   // 緊締を試す：上から見た図
     const st = cur, g = geom(st), sh = g.sh;
     // 絵の緑に合わせた色（テーマで変えない。絵は画像なので）
     const C = { green: '#1FB04C', greenDark: '#0E5B2A', plate: '#3FA35A', hole: '#0C442A', rail: '#149648', steel: '#3A444C', alu: '#C9CDC6', aluLine: '#8E948B',
@@ -562,7 +665,7 @@ for (const u of [BASE_IMG, PROBOX_IMG, IS_IMG]) { const im = new Image(); im.src
         const wb = carWbPx('probox', UP_LEN), a0 = DECK_L - 6 - wb, p0 = onDeck(g, a0 / DECK_L), d = ang + 15 * Math.PI / 180;
         upCar = drawCar(svg, p0.x + wb / 2 * Math.cos(d), p0.y - 4 + wb / 2 * Math.sin(d), d, '#F4F6F4', UP_LEN, 'probox');
       }
-      else { const q = onDeck(g, UP_F + (st.crash * -93 + st.slide * -64 + (st.slidePx || 0)) / DECK_L); const hp = st.hop || 0; upCar = drawCar(svg, q.x + Math.sin(ang) * hp, q.y - 4 - Math.cos(ang) * hp, ang, '#F4F6F4', UP_LEN, 'probox'); }
+      else { const q = onDeck(g, UP_F + (st.crash * -93 + st.slide * -64 + (st.slidePx || 0)) / DECK_L); const hp = st.hop || 0; upCar = drawCar(svg, q.x + Math.sin(ang) * hp, q.y - 4 - Math.cos(ang) * hp, ang, '#F4F6F4', UP_LEN, 'probox', false, tSideOn && tSideOn.up); }
     }
     if (st.low > 0) {
       const slope = st.lowSlope > .5;
@@ -570,7 +673,7 @@ for (const u of [BASE_IMG, PROBOX_IMG, IS_IMG]) { const im = new Image(); im.src
       const rest = { x: pose.x, y: pose.y - 4 - (st.hop2 || 0) };
       const pts = [start, rampTop, g.hingeTop, rest];
       if (carP.low < 1) { const q = along(pts, carP.low); lowCar = drawCar(svg, q.x, q.y - 4, q.ang + Math.PI, '#F4F6F4', LOW_LEN, 'is', true); }
-      else lowCar = drawCar(svg, rest.x, rest.y, pose.ang, '#F4F6F4', LOW_LEN, 'is', true);
+      else lowCar = drawCar(svg, rest.x, rest.y, pose.ang, '#F4F6F4', LOW_LEN, 'is', true, tSideOn && tSideOn.low);
       if (slope) { const c = { x: 1300, y: lowerFloorY(1298, g) - 4 }; el('path', { d: `M${c.x - 10},${c.y + 4} L${c.x},${c.y - 12} L${c.x + 10},${c.y + 4} Z`, fill: '#E9C21A', stroke: C.steel, 'stroke-width': 1 }, svg); }
     }
 
@@ -592,13 +695,18 @@ for (const u of [BASE_IMG, PROBOX_IMG, IS_IMG]) { const im = new Image(); im.src
 
     // ── 緊締 ──
     // 上段は走行のとき前下がりに傾くので、ゲート側（後ろ）へ引く。前へ引くと車はキャビン側へ下がる
-    if (simMode) {
+    if (tSideOn) tireSideMarks(svg, g, upCar, lowCar);   // タイヤ固縛を試す（横から）
+    else if (simMode) {
       if (upCar) simWires(svg, g, upCar, ang);
       if (lowCar) simWiresLow(svg, g, lowCar);
+      for (const [car, name, ks] of [[upCar, '上段', [lash.F, lash.R]], [lowCar, '下段', [lash.LF, lash.LR]]]) if (car)
+        car.hooks.slice().sort((a, b) => a.x - b.x).forEach((h, i) => { if (ks[i] !== 'none') zoomTap(svg, h.x, h.y, 42, `${name}・${i ? 'ゲート' : 'キャビン'}側の緊締`, 'side'); });
     }   // 試すときは選んだ緊締だけ
+    else if (st.wU > .5 && upCar && carP.up >= 1 && tireHere('up')) tireOnCar(svg, 'up', upCar, 9, -5);   // 上段の床板は面の上 9、車は面の上 4 に置いている
     else if (st.wU > .5 && upCar && carP.up >= 1) { const ks = (st.badWire > .5 ? ['front', 'front'] : ['down', 'back']).map((k, i) => wireOv.up[i] || k); wires(svg, upCar.hooks, x => onDeck(g, clamp((x - g.deck.x1) / (g.deck.x2 - g.deck.x1), 0, 1)), HOOK[ks[0]], HOOK[ks[1]]); lastWheels.up = upCar.hooks.slice().sort((a, b) => a.x - b.x); }   // キャビン側は真下引き、ゲート側はゲート側へ
     // 下段は後ろ下がりの斜めに載るので、前（キャビン側）へ引く
-    if (st.wL > .5 && lowCar && carP.low >= 1) { const ks = ['front', 'down'].map((k, i) => wireOv.low[i] || k); wires(svg, lowCar.hooks, x => ({ x, y: lowerFloorY(x, g) }), HOOK[ks[0]], HOOK[ks[1]]); lastWheels.low = lowCar.hooks.slice().sort((a, b) => a.x - b.x); }   // キャビン側は前へ、ゲート側は真下引き
+    if (st.wL > .5 && lowCar && carP.low >= 1 && tireHere('low')) tireOnCar(svg, 'low', lowCar, 11, 4);
+    else if (st.wL > .5 && lowCar && carP.low >= 1) { const ks = ['front', 'down'].map((k, i) => wireOv.low[i] || k); wires(svg, lowCar.hooks, x => ({ x, y: lowerFloorY(x, g) }), HOOK[ks[0]], HOOK[ks[1]]); lastWheels.low = lowCar.hooks.slice().sort((a, b) => a.x - b.x); }   // キャビン側は前へ、ゲート側は真下引き
 
     // ── すき間・高さ・ぶつかり ──
     if (st.clear > .5 && lowCar) {
@@ -633,13 +741,15 @@ for (const u of [BASE_IMG, PROBOX_IMG, IS_IMG]) { const im = new Image(); im.src
     }
 
     // ── 手順：緊締した車輪を押すと拡大の小窓（引く向きを試せる）──
-    if (!simMode) for (const car of ['up', 'low']) (lastWheels[car] || []).forEach((w, i) => {
+    if (!simMode && !tSideOn) for (const car of ['up', 'low']) (lastWheels[car] || []).forEach((w, i) => {
+      if (w.tire && !w.near) return;   // タイヤ固縛は手前の車輪だけ（奥は小窓で説明）
       // 押せることが分かるように、赤い点線の四角い枠と、それを指す矢印を 1 秒ごとに点滅させる（10/17 本人）
       // 印は緊締の手順（上段＝wireU・下段＝wireL）の、その段の車輪だけ
       const markHere = (S[idx].hi === 'wireU' && car === 'up') || (S[idx].hi === 'wireL' && car === 'low');
       const mark = markHere && el('g', { 'pointer-events': 'none' }, svg);
       if (mark) {
-        el('rect', { x: w.x - 70, y: w.y - 85, width: 140, height: 120, rx: 8, fill: 'none', stroke: C.danger, 'stroke-width': 7, 'stroke-dasharray': '16 10' }, mark);
+        if (w.tire) el('rect', { x: w.x - 60, y: w.y - 56, width: 120, height: 112, rx: 8, fill: 'none', stroke: C.danger, 'stroke-width': 7, 'stroke-dasharray': '16 10' }, mark);
+        else el('rect', { x: w.x - 70, y: w.y - 85, width: 140, height: 120, rx: 8, fill: 'none', stroke: C.danger, 'stroke-width': 7, 'stroke-dasharray': '16 10' }, mark);
         // 矢印は斜め下から：前側（キャビン側）の車輪は枠の左下の角を左下から、後ろ側（ゲート側）は右下の角を右下から指す（10/17 本人）
         const sx = i === 0 ? -1 : 1;
         const ax = w.x + sx * 70, ay = w.y + 35;
@@ -647,7 +757,8 @@ for (const u of [BASE_IMG, PROBOX_IMG, IS_IMG]) { const im = new Image(); im.src
         el('path', { d: `M${ax + sx * L},${ay + L} L${ax + sx * 14},${ay + 14}`, stroke: C.danger, 'stroke-width': 12, 'stroke-linecap': 'round', fill: 'none' }, mark);
         el('path', { d: `M${ax + sx * 2},${ay + 2} L${ax + sx * 50},${ay + 14} L${ax + sx * 14},${ay + 50} Z`, fill: C.danger }, mark);
         // 矢印の根元の外側に「TAP！」（白い縁どりで、図の上でも読めるように）
-        const tap = el('text', { x: ax + sx * (L + 12), y: Math.min(ay + L + 26, 804), 'text-anchor': i === 0 ? 'end' : 'start', 'font-size': 80, 'font-weight': 900, fill: C.danger,
+        const tap = el('text', { x: ax + sx * (L + 12), y: Math.min(ay + L + 26, 804),   // 図の下の端で切れないように
+                                 'text-anchor': i === 0 ? 'end' : 'start', 'font-size': 80, 'font-weight': 900, fill: C.danger,
                                  stroke: '#FFFFFF', 'stroke-width': 8, 'paint-order': 'stroke', 'stroke-linejoin': 'round' }, mark);
         tap.textContent = 'TAP！';
       }
@@ -657,7 +768,7 @@ for (const u of [BASE_IMG, PROBOX_IMG, IS_IMG]) { const im = new Image(); im.src
     });
     // ── 今さわるところ ──
     // 緊締の手順は TAP！の印（下）で示すので、赤丸は出さない（重なってごちゃつくため）
-    const hi = simMode || S[idx].hi === 'wireU' || S[idx].hi === 'wireL' ? null : S[idx].hi;
+    const hi = simMode || tSideOn || S[idx].hi === 'wireU' || S[idx].hi === 'wireL' ? null : S[idx].hi;
     const spots = { cab: [150, 500], lock: [g.hinge.x + (g.L - 140) * Math.cos(g.a), g.hinge.y + (g.L - 140) * Math.sin(g.a)], gsw: [1250, lowerFloorY(1250, g) + FLOOR_T + 18], plate: [g.tip.x + 30 * Math.cos(g.a), g.tip.y - 10], chockU: [onDeck(g, .06).x, onDeck(g, .06).y - 12], fsw: [372, 605 + sh(372)], pins: [[pF.x, pF.y], [pR.x, pR.y]], wireU: upCar ? [upCar.wheels[1].x, upCar.wheels[1].y] : null, wireL: lowCar ? [lowCar.wheels[1].x, lowCar.wheels[1].y] : null, slope: [1200, 672 + sh(1200)], clear: [1000, 430], height: [30, 300] };
     const sp0 = hi && spots[hi];
     // 2 か所以上のとき（安全ピン＝前の柱の穴と後ろの油圧シリンダー。左右にもあるので 4 か所）は、それぞれに丸を出す
@@ -676,20 +787,48 @@ for (const u of [BASE_IMG, PROBOX_IMG, IS_IMG]) { const im = new Image(); im.src
       const world = el('g', { transform: `rotate(${(simView.theta * 180 / Math.PI).toFixed(3)},720,${G}) translate(0,${simView.shake.toFixed(2)})` });
       while (svg.firstChild) world.appendChild(svg.firstChild);
       svg.appendChild(world);
-      document.getElementById('simWhy').textContent = simView.why;
-      const r1 = document.getElementById('simRes1'), r2 = document.getElementById('simRes2');
-      r1.textContent = simView.msg ? (simView.msg2 ? '上段：' : '') + simView.msg : ''; r1.classList.toggle('bad', !!simView.bad);
-      r2.textContent = simView.msg2 || ''; r2.classList.toggle('bad', !!simView.bad2);
+      simTexts();
       if (simView.hit2 === 'deck' && lowCar) { const p = simView.hitPt2 || { x: lowCar.wheels[0].x + 80, y: lowCar.top + 8 }; el('circle', { cx: p.x, cy: p.y, r: 30, fill: 'none', stroke: C.danger, 'stroke-width': 10 }, svg); }
       if (simView.hit2 === 'column' && lowCar) el('circle', { cx: COL.x2 + 10, cy: lowCar.top + 40, r: 30, fill: 'none', stroke: C.danger, 'stroke-width': 10 }, svg);
       if (simView.hit === 'cab' && upCar) { const p = simView.hitPt || { x: CAB_X, y: upCar.top + 50 }; el('circle', { cx: Math.min(p.x, CAB_X) + 4, cy: p.y, r: 34, fill: 'none', stroke: C.danger, 'stroke-width': 10 }, svg); }
       if (simView.hit === 'column' && upCar) el('circle', { cx: COL.x2 + 6, cy: upCar.wheels[0].y - 30, r: 30, fill: 'none', stroke: C.danger, 'stroke-width': 10 }, svg);
       if (simView.hit === 'derail' && upCar) { const w = upCar.wheels.slice().sort((a, b) => b.x - a.x)[0]; el('circle', { cx: w.x, cy: w.y, r: 34, fill: 'none', stroke: C.danger, 'stroke-width': 10 }, svg); }
       if (simView.hit === 'gate' && upCar) el('circle', { cx: g.hinge.x - 10, cy: upCar.wheels[1].y - 20, r: 30, fill: 'none', stroke: C.danger, 'stroke-width': 10 }, svg);
+      if (simView.lat) {
+        // 真上の図（トラックと 2 台）。車のキャビン側の端・ゲート側の端の横のずれから、車を動かして回す（見やすさで 2 倍）
+        const si = .78, iw = 1418 * si + 24, ih = 517 * si + 60, ix = 1472 - iw, iy = 208, G2 = 2 * 126;   // スマホでも見えるように、図の上半分を使って大きく（横のずれが残っているあいだ。「車を元の位置に戻す」で消える）
+        const ins = el('g', { 'pointer-events': 'none' }, svg);
+        el('rect', { x: ix, y: iy, width: iw, height: ih, rx: 18, fill: C.surface, stroke: C.muted, 'stroke-width': 3 }, ins);
+        const tt = el('text', { x: ix + 16, y: iy + 38, 'font-size': 40, 'font-weight': 900, fill: C.muted }, ins); tt.textContent = '上から見た図（↑ 外側へ押される・ずれは 2 倍）';
+        const g0 = el('g', { transform: `translate(${ix + 12},${iy + 50}) scale(${si})` }, ins);
+        el('image', { href: TOP_TRUCK, x: 0, y: 0, width: 1418, height: 517 }, g0);
+        const put = (img, x0, y0, w, h, lenM, L) => {
+          const dy = -(L.c + L.g) / 2 * G2, ang = Math.atan2((L.c - L.g) * G2, lenM * 126) * 180 / Math.PI;
+          const cg = el('g', { transform: `translate(${x0 + w / 2},${y0 + h / 2 + dy}) rotate(${ang.toFixed(2)})` }, g0);
+          el('image', { href: img, x: -w / 2, y: -h / 2, width: w, height: h }, cg);
+        };
+        if (simView.lat.low) put(TOP_IS, 691, 127, 594, 260, 4.71, simView.lat.low);
+        el('image', { href: TOP_RAMPS, x: 0, y: 0, width: 1418, height: 517 }, g0);
+        put(TOP_PROBOX, 395, 137, 535, 245, 4.245, simView.lat.up);
+      }
       if (simView.hit2 === 'gate' && lowCar) el('circle', { cx: g.hinge.x - 10, cy: lowCar.top + 60, r: 30, fill: 'none', stroke: C.danger, 'stroke-width': 10 }, svg);
     }
   }
 
+  function setPhrased(node, text) {
+    node.textContent = '';
+    String(text || '').split('\n').forEach((line, i) => {
+      if (i) node.appendChild(document.createElement('br'));
+      for (const seg of line.replace(/([、。！？）：])/g, '$1\u0000').replace(/（/g, '\u0000（').replace(/｜/g, '\u0000').split('\u0000')) { if (!seg) continue; const sp = document.createElement('span'); sp.className = 'ph'; sp.textContent = seg; node.appendChild(sp); }
+    });
+  }
+  function simTexts() {
+    if (!simView) return;
+    setPhrased(document.getElementById('simWhy'), simView.why);
+    const r1 = document.getElementById('simRes1'), r2 = document.getElementById('simRes2');
+    setPhrased(r1, simView.msg ? (simView.msg2 ? '上段：' : '') + simView.msg : ''); r1.classList.toggle('bad', !!simView.bad);
+    setPhrased(r2, simView.msg2 || ''); r2.classList.toggle('bad', !!simView.bad2);
+  }
   function animateTo(next, opts = {}) {
     cancelAnimationFrame(anim);
     const from = { ...cur };
@@ -767,26 +906,78 @@ for (const u of [BASE_IMG, PROBOX_IMG, IS_IMG]) { const im = new Image(); im.src
       : (i === 0 ? '下段は後ろ下がりの「への字」で、車はゲート側へずり下がろうとします。キャビン側は前引で止めます。' : '下段のゲート側は真下引き。');
     return { where, ok, text: (ok ? '✓ 正しい。' : '✗ ちがいます。') + mean + ' ' + need };
   }
-  function openZoom(car, i) {
-    zoomAt = { car, i };
+  // シミュレーションの図の、緊締・固縛のところに押せる丸（押すと小窓で拡大。拡大の中も動き続ける。10/19 本人）
+  // (x, y)＝押せる丸、(zx, zy)＝拡大の真ん中（タイヤ固縛はラチェットの側へ寄せて①から④まで入るように。上から見た図は車の側へ寄せる）
+  // シミュレーションの図は毎コマ描き直すので、丸に click を付けると iPhone ではタップが取り消される（押した直後に中身が変わるため）。
+  // 押せる場所は図ごとの一覧に入れておき、描き直さない図（svg）そのもので指を離した位置を受けて、近いものを開く（10/19）
+  const tapTargets = new WeakMap();
+  function zoomTap(svg, x, y, r, label, view, zx = x, zy = y) {
+    if (svg.id === 'zoomSvg') return;
+    if (!tapTargets.has(svg)) tapTargets.set(svg, []);
+    tapTargets.get(svg).push({ x, y, r, z: { mode: document.body.classList.contains('tiremode') ? 'tire' : 'sim', view, x: zx, y: zy, label } });
+    el('circle', { class: 'ztap', cx: x.toFixed(1), cy: y.toFixed(1), r, fill: 'transparent', 'pointer-events': 'none', 'aria-hidden': 'true' }, svg);   // 場所の目印（確かめる道具用）
+  }
+  for (const id of ['truck', 'tTop', 'tSide']) {
+    const svg = document.getElementById(id); let down = null;
+    // 指で触ると、離したときの知らせは最初に触った部品に届く。その部品は次のコマで消えるので、図（svg）が受け取るようにする
+    svg.addEventListener('pointerdown', e => { down = { x: e.clientX, y: e.clientY }; try { svg.setPointerCapture(e.pointerId); } catch (err) {} });
+    svg.addEventListener('pointerup', e => {
+      const d0 = down; down = null;
+      if (!d0 || Math.hypot(e.clientX - d0.x, e.clientY - d0.y) > 12) return;   // 指が動いたら（スクロール）開かない
+      const list = tapTargets.get(svg), m = svg.getScreenCTM();
+      if (!list || !list.length || !m) return;
+      const pt = new DOMPoint(e.clientX, e.clientY).matrixTransform(m.inverse());
+      let best = null, bd = Infinity;
+      for (const t of list) { const d = Math.hypot(pt.x - t.x, pt.y - t.y); if (d <= t.r * 1.3 && d < bd) { best = t; bd = d; } }
+      if (best) openZoom(null, null, best.z);
+    });
+  }
+  function refreshSimZoom() {
+    const z = zoomAt.sim, zs = document.getElementById('zoomSvg');
+    zs.textContent = '';
+    if (z.mode === 'sim') { if (z.view === 'top') drawSimTop(zs); else { renderTarget = zs; try { render(); } finally { renderTarget = null; } } }
+    else if (tState) { if (z.view === 'top') tDrawTop(zs); else tDrawSide(zs); }
+    const [w, h] = z.view === 'top' ? [560, 350] : z.mode === 'tire' ? [300, 188] : [240, 150];
+    zs.setAttribute('viewBox', `${(z.x - w / 2).toFixed(1)} ${(z.y - h / 2).toFixed(1)} ${w} ${h}`);
+    document.getElementById('zoomTitle').textContent = z.label;
+    const rs = (z.mode === 'sim' ? ['simRes1', 'simRes2'] : ['tRes', 'tRes2']).map(id => document.getElementById(id));
+    const m = document.getElementById('zoomMsg'); setPhrased(m, rs.map(r => r.textContent).filter(Boolean).join('\n')); m.classList.toggle('bad', rs.some(r => r.classList.contains('bad')));
+    document.getElementById('zoomWhy').hidden = true;
+    const ex = document.getElementById('zoomExp'); ex.hidden = true; ex.style.background = '';
+    // 拡大したまま試せるように、走り方のボタン（本体のボタンを押すのと同じ。動いているあいだは押せない）
+    const box = document.getElementById('zoomBtns');
+    if (!z.built) {
+      z.built = true; box.innerHTML = ''; box.style.gridTemplateColumns = 'repeat(4, 1fr)';
+      const ids = z.mode === 'sim' ? [['simBrake', '急ブレーキ'], ['simAccel', '急加速'], ['simCurve', 'カーブ'], ['simBump', '段差']] : [['tBrake', '急ブレーキ'], ['tAccel', '急加速'], ['tCurve', 'カーブ'], ['tBump', '段差']];
+      for (const [id, n] of ids) { const b = document.createElement('button'); b.className = 'chip ev'; b.type = 'button'; b.textContent = n; b.dataset.for = id; b.onclick = () => document.getElementById(id).click(); box.appendChild(b); }
+    }
+    for (const b of box.children) b.disabled = document.getElementById(b.dataset.for).disabled;
+  }
+  let zoomOpenedAt = 0;
+  function openZoom(car, i, sim) {
+    zoomAt = sim ? { sim } : { car, i };
     let ov = document.getElementById('zoomOv');
     if (!ov) {
       ov = document.createElement('div'); ov.id = 'zoomOv'; ov.className = 'zoomov';
       ov.innerHTML = `<div class="zoombox" role="dialog" aria-modal="true"><div class="zoomhd"><b id="zoomTitle"></b><button class="btn" type="button" id="zoomClose">閉じる</button></div><svg class="zoomsvg" id="zoomSvg"></svg><p class="zoommsg" id="zoomMsg"></p><button class="zoomwhy" type="button" id="zoomWhy" aria-expanded="false"></button><div class="zoomexp" id="zoomExp" hidden></div><div class="chips zoombtns" id="zoomBtns"></div></div>`;
       document.body.appendChild(ov);
-      ov.addEventListener('click', e => { if (e.target === ov) closeZoom(); });
+      // 指を離して開いた直後に、スマホが同じ場所へ送るクリックが背景に当たって閉じないように（0.5 秒は背景で閉じない）
+      ov.addEventListener('click', e => { if (e.target === ov && performance.now() - zoomOpenedAt > 500) closeZoom(); });
       document.getElementById('zoomClose').onclick = closeZoom;
       document.getElementById('zoomWhy').onclick = () => { zoomExplain = !zoomExplain; refreshZoom(); };
     }
-    zoomExplain = false;
+    zoomExplain = false; zoomOpenedAt = performance.now();
     ov.hidden = false;
     refreshZoom();
   }
-  function closeZoom() { zoomAt = null; const ov = document.getElementById('zoomOv'); if (ov) ov.hidden = true; }
+  function closeZoom() { cancelAnimationFrame(tzAnim); zoomAt = null; const ov = document.getElementById('zoomOv'); if (ov) ov.hidden = true; }
   function refreshZoom() {
     if (!zoomAt) return;
+    if (zoomAt.sim) { refreshSimZoom(); return; }
     const { car, i } = zoomAt, w = (lastWheels[car] || [])[i];
     if (!w) { closeZoom(); return; }
+    if (w.tire) { refreshTireZoom(); return; }
+    document.getElementById('zoomWhy').hidden = false; document.getElementById('zoomExp').style.background = ''; document.getElementById('zoomBtns').style.gridTemplateColumns = '';
     const k = wireOv[car][i] || WIRE_DEF[car][i], why = wireWhy(car, i, k);
     const zs = document.getElementById('zoomSvg');
     zs.innerHTML = document.getElementById('truck').innerHTML;
@@ -834,12 +1025,28 @@ for (const u of [BASE_IMG, PROBOX_IMG, IS_IMG]) { const im = new Image(); im.src
       <div class="where">場所：<b>${s.where}</b></div><p>${s.p}</p>
       ${s.top ? topView() : ''}
       ${s.warn ? `<div class="warn"><strong>⚠ ${s.warn[0]}</strong><span>${s.warn[1]}</span></div>` : ''}
-      ${s.tip ? `<div class="tip">${s.tip}</div>` : ''}
-      ${s.hi === 'wireU' || s.hi === 'wireL' ? `<p class="note">図のワイヤーのところを押すと拡大して、真下・前引・後ろ引を試せます。</p>` : ''}
-      ${s.seq ? `<div class="demo"><button class="btn" type="button" id="good">前後を少しずつ上げる</button><button class="btn danger" type="button" id="bad">後ろだけ上げると？</button></div>` : ''}
+      ${s.tip ? `<div class="tip" id="stepTip">${s.tip}</div>` : ''}
+      ${s.hi === 'wireU' || s.hi === 'wireL' ? `<div id="lashNote"></div><div class="demo"><button class="btn" type="button" id="tireBtn"></button><button class="btn" type="button" id="tireExpBtn">タイヤ固縛の解説</button></div>` : ''}
+      ${s.seq ? `<div class="demo"><button class="btn" type="button" id="good">前後を｜少しずつ上げる</button><button class="btn danger" type="button" id="bad">後ろだけ｜上げると？</button></div>` : ''}
       ${s.drive ? `<div class="demo"><button class="btn" type="button" id="again">もう一度見る</button></div>` : ''}
-      ${s.wireDemo ? `<div class="demo"><button class="btn" type="button" id="goodWire">ゲート側へ引く（正しい）</button><button class="btn danger" type="button" id="badWire">前へ引いていると？</button></div>` : ''}`;
+      ${s.wireDemo ? `<div class="demo"><button class="btn" type="button" id="goodWire">ゲート側へ引く（正しい）</button><button class="btn danger" type="button" id="badWire">前へ引いて｜いると？</button></div>` : ''}`;
+    card.querySelectorAll('.demo .btn').forEach(b => setPhrased(b, b.textContent));   // 2 つ並びのボタンは言葉の切れ目で折り返す
     const next = { ...base, ...s.s };
+    tireMode = false;
+    if (s.hi === 'wireU' || s.hi === 'wireL') {
+      const car = s.hi === 'wireU' ? 'up' : 'low';
+      const show = () => {
+        const nm = TIRE_NAME[car];
+        const tp = document.getElementById('stepTip'); if (tp) tp.hidden = tireMode;   // ワイヤーの引く向きの補足
+        document.getElementById('tireBtn').textContent = tireMode ? 'ワイヤー緊締に戻す' : 'タイヤ固縛の場合';
+        document.getElementById('lashNote').innerHTML = tireMode
+          ? `<div class="tip">タイヤ固縛は<b>対角の 2 輪</b>にかけます。図で見えている手前の<b>${nm.near}</b>（${nm.nearAt}）と、奥の<b>${nm.far}</b>（${nm.farAt}）です。締める向きは、手前は${nm.nearTo}へ、奥は${nm.farTo}へ。図のタイヤを押すと拡大して、かけ方と力の向きが見られます。</div><div class="warn"><strong>⚠ 跳ねるのが怖いとき</strong><span>タイヤ固縛は車体の上下を押さえないので、<b>ワイヤー緊締をプラス</b>して跳ねるのを抑えます。</span></div>`
+          : `<p class="note">図のワイヤーのところを押すと拡大して、真下・前引・後ろ引を試せます。</p>`;
+      };
+      document.getElementById('tireBtn').onclick = () => { tireMode = !tireMode; closeZoom(); show(); render(); };
+      document.getElementById('tireExpBtn').onclick = openTireExplain;
+      show();
+    }
     { const un = S.findIndex(x => x.t.startsWith('ゲートロックを左右とも外す')), re = S.findIndex(x => x.seqStates); if (idx >= un && idx < re) next.lock = 0; }
     carP = { up: 1, low: 1 };
     const forward = idx === prevIdx + 1;
@@ -915,6 +1122,12 @@ for (const u of [BASE_IMG, PROBOX_IMG, IS_IMG]) { const im = new Image(); im.src
       else { const tStop = ev.tStop ?? (ev.tStop = s); a = (s - tStop) < .25 ? -.12 * GV : 0; }
       return { a, v: v * 3.6 };
     }
+    if (ev.k === 'accel') {
+      // 急加速：0.25 G（空に近い積載車で、いちばん強く踏んだくらい）。車は後ろ（ゲート側）へ押される
+      const a = -.25 * GV * clamp(s / .3, 0, 1) * (1 - clamp((s - 2.6) / .3, 0, 1));
+      return { a, v: Math.min(60, s * .25 * GV * 3.6) };
+    }
+    if (ev.k === 'curve' || ev.k === 'bump') return { a: 0, v: 40 };
     if (ev.k === 'crash') {
       const T = .06, t1 = .15, dv = 2.2, A = dv * Math.PI / (2 * T);
       const a = s > t1 && s < t1 + T ? A * Math.sin(Math.PI * (s - t1) / T) : 0;
@@ -931,6 +1144,25 @@ for (const u of [BASE_IMG, PROBOX_IMG, IS_IMG]) { const im = new Image(); im.src
     for (const [A, f, p] of parts) { const w = 2 * Math.PI * f; z += A * Math.sin(w * t + p); az += -A * w * w * Math.sin(w * t + p); }
     const ax = (R ? 2.5 : 1) * GV * (.08 * Math.sin(2 * Math.PI * .7 * t) + .05 * Math.sin(2 * Math.PI * 2.3 * t + .4));
     return { z, az, ax };
+  }
+  // 段差：高さ 5 cm を 0.1 秒で越える（トラックの前輪と後輪で 2 回）。床が急に下がるとき、上から押さえる緊締がないと浮く
+  function bumpShake(ev, t) {
+    let z = 0, az = 0;
+    if (ev && ev.k === 'bump') for (const [t1, A] of [[.1, .05], [.45, .04]]) { const u = t - ev.t0 - t1, T = .1; if (u > 0 && u < T) { const w = Math.PI / T; z += A * Math.sin(w * u); az -= A * w * w * Math.sin(w * u); } }
+    return { z, az };
+  }
+  // カーブ：外側（横）へ 0.5 G。横はタイヤが鋼の網の上をすべる（0.25）。緊締のある端は、ワイヤーで横にも止まる。
+  // 車のキャビン側の端・ゲート側の端を別々に動かす（片側だけ止まっていると、もう片側が振られる）。L＝{ c, g, vc, vg }（m・外側が＋）
+  const LAT_EV = (ev, t) => ev && ev.k === 'curve' ? .5 * GV * clamp((t - ev.t0) / .5, 0, 1) * (1 - clamp((t - ev.t0 - 2.2) / .5, 0, 1)) : 0;
+  function stepLat(L, keys, mass, ay, dt) {
+    for (const [e, k] of [['c', keys[0]], ['g', keys[1]]]) {
+      const m = mass / 2, K = k === 'none' ? 0 : K_WIRE * .5, c = K ? 2 * .3 * Math.sqrt(K * m) : 0;
+      const y = L[e], v = L['v' + e], fr = T_MU * m * GV, f = m * ay - K * y - c * v;
+      if (Math.abs(v) < 1e-3 && Math.abs(f) <= fr) { L['v' + e] = 0; continue; }
+      let nv = v + (f - Math.sign(v || f) * fr) / m * dt;
+      if (v !== 0 && Math.sign(nv) !== Math.sign(v)) nv = 0;
+      L['v' + e] = nv; L[e] = clamp(y + nv * dt, -.6, .6);
+    }
   }
   // 緊締の効き（1 kg あたりのばね m/s² per m）：前へ動くのを止める・後ろへ動くのを止める・浮くのを止める
   function lashK(keys, mass) {
@@ -951,7 +1183,7 @@ for (const u of [BASE_IMG, PROBOX_IMG, IS_IMG]) { const im = new Image(); im.src
     if (a < d0 + CH_TOP + CH_DOWN) return { h: CH_H * (1 - (a - d0 - CH_TOP) / CH_DOWN), s: -CH_H / CH_DOWN };
     return { h: 0, s: 0, over: true };
   }
-  function newBody() { return { x: 0, v: 0, z: 0, vz: 0, air: false, sx: 0, svx: 0, bz: 0, bvz: 0, over: false, moved: 0, hit: false, maxF: 0 }; }
+  function newBody() { return { lat: { c: 0, g: 0, vc: 0, vg: 0 }, x: 0, v: 0, z: 0, vz: 0, air: false, sx: 0, svx: 0, bz: 0, bvz: 0, over: false, moved: 0, hit: false, maxF: 0 }; }
   function simBase() { return { ...base, pto: 1, up: 1, pin: 1, wU: 1, upF: simF, upR: simR, low: lowOn ? 1 : 0 }; }
   function resetSim() {
     cancelAnimationFrame(simAnim); cancelAnimationFrame(anim);   // 手順の動きが残っていたら止める
@@ -962,7 +1194,7 @@ for (const u of [BASE_IMG, PROBOX_IMG, IS_IMG]) { const im = new Image(); im.src
   }
   function setEventButtons() {
     const busy = !!simState?.ev && !simState.ev.done;
-    for (const id of ['simBrake', 'simCrash']) { const b = document.getElementById(id); if (b) b.disabled = busy; }
+    for (const id of ['simBrake', 'simCrash', 'simAccel', 'simCurve', 'simBump']) { const b = document.getElementById(id); if (b) b.disabled = busy; }
   }
   // 1 台ぶんを dt だけ進める。slope＝床の傾きによる前向きの加速度、aT＝トラックの減速、sh＝道の揺れ
   function stepBody(b, P, keys, slope, aT, sh, dt) {
@@ -1014,14 +1246,18 @@ for (const u of [BASE_IMG, PROBOX_IMG, IS_IMG]) { const im = new Image(); im.src
     const dtAll = Math.min(.05, (now - st.last) / 1000); st.last = now;
     const t = (now - st.t0) / 1000;
     const ev = truckEvent(st.ev, t);
-    if (st.ev && !st.ev.done && t - st.ev.t0 > (st.ev.k === 'brake' ? 3.2 : 2.5)) { st.ev.done = true; setEventButtons(); }
+    if (st.ev && !st.ev.done && t - st.ev.t0 > ({ brake: 3.2, accel: 3.2, curve: 3.4, bump: 2.0 }[st.ev.k] ?? 2.5)) { st.ev.done = true; setEventButtons(); }
     st.theta += ((-ev.a / GV) * 1.5 * Math.PI / 180 - st.theta) * Math.min(1, dtAll * 8);   // ブレーキで少し前のめり
     cur = { ...simBase(), slidePx: -st.up.x * PXM, slidePx2: -st.low.x * PXM };
     const g = geom(cur);
     const N = 8, dt = dtAll / N;
     let lift1 = 0, lift2 = 0, sh = roadShake(t);
     for (let i = 0; i < N; i++) {
-      sh = roadShake(t - dtAll + dt * (i + 1));
+      const ti = t - dtAll + dt * (i + 1);
+      sh = roadShake(ti); { const b = bumpShake(st.ev, ti); sh.z += b.z; sh.az += b.az; }
+      const ay = LAT_EV(st.ev, ti);
+      if (!st.up.hit) stepLat(st.up.lat, [lash.F, lash.R], BODY.up.mass, ay, dt);
+      if (lowOn && !st.low.hit) stepLat(st.low.lat, [lash.LF, lash.LR], BODY.low.mass, ay, dt);
       if (!st.up.hit) lift1 = stepBody(st.up, { ...BODY.up, shiftKey: shift.up, sb: sideBrake.up }, [lash.F, lash.R], -GV * Math.sin(g.ang + st.theta), ev.a, sh, dt).liftPx;
       if (lowOn && !st.low.hit) lift2 = stepBody(st.low, { ...BODY.low, shiftKey: shift.low, sb: sideBrake.low }, [lash.LF, lash.LR], -GV * Math.sin(LOW_ANG + st.theta), ev.a, sh, dt).liftPx;
     }
@@ -1039,7 +1275,8 @@ for (const u of [BASE_IMG, PROBOX_IMG, IS_IMG]) { const im = new Image(); im.src
     cur = { ...simBase(), derail: U.hit === 'derail' ? 1 : 0, slidePx: sUp - sway(U), hop: U.z * PXM + lift1 + bounce(U), slidePx2: sLow - sway(D), hop2: D.z * PXM + lift2 + bounce(D) };
     // 文
     const why = st.ev
-      ? (st.ev.k === 'brake' ? `急ブレーキ（時速 60 km から）　いま ${Math.max(0, Math.round(ev.v ?? 0))} km/h` : `止まっている車に追突（時速 60 km・ノーブレーキ）　いま ${Math.round(ev.v ?? 0)} km/h`)
+      ? ({ brake: `急ブレーキ（時速 60 km から）　いま ${Math.max(0, Math.round(ev.v ?? 0))} km/h`, crash: `止まっている車に追突（時速 60 km・ノーブレーキ）　いま ${Math.round(ev.v ?? 0)} km/h`,
+           accel: `急加速　いま ${Math.round(ev.v ?? 0)} km/h`, curve: '左カーブ（外側へ押される）', bump: '段差を越えた（高さ 5 cm）' }[st.ev.k])
       : `${road.k === 'rough' ? '悪路' : '通常の道'}を走行中　上段 ${carName('up')}${lowOn ? `　下段 ${carName('low')}` : ''}`;
     const say = (b, low) => {
       const strong = b.maxF > 20000 ? `（ワイヤーに 約 ${Math.round(b.maxF / 9800 * 10) / 10} トンの力）` : '';
@@ -1048,6 +1285,8 @@ for (const u of [BASE_IMG, PROBOX_IMG, IS_IMG]) { const im = new Image(); im.src
       if (b.hit === 'derail') return ['ゲート側の車輪がフロアの端から落ちた（脱輪）！\nゲート側へ動くのを止める緊締がない', true];
       if (b.hit === 'gate') return ['後ろへ動いてリアゲートに当たった！', true];
       if (b.hit === 'deck') return [b.hitBump ? '跳ねて上段フロアに当たった！' : '上段フロアが下段の車に当たった！\n上段を上げる', true];
+      { const lc = Math.abs(b.lat.c) > .08, lg = Math.abs(b.lat.g) > .08;
+        if (lc || lg) return [`カーブで横に滑った！（${lc && lg ? '前後とも' : lc ? 'キャビン側が' : 'ゲート側が'}振られた）`, true]; }
       if (!low && b.over) return [b.moved > 0 ? '輪止めを乗り越えて前へ進んでいく！' : '輪止めを乗り越えた！', true];
       if (b.air || b.z > .003) return ['跳ね上がっている！ 上から押さえる緊締がない', true];
       if (b.moved > 0) return ['キャビン側へ動いていく！', true];
@@ -1059,7 +1298,7 @@ for (const u of [BASE_IMG, PROBOX_IMG, IS_IMG]) { const im = new Image(); im.src
       if (L.fwd + L.bwd === 0 && L.up === 0) { const k = low ? 'low' : 'up', held = shift[k] === 'P' || sideBrake[k]; return [held ? '揺れている（緊締なし。上下前後に動く）' : '止まっている（緊締なし）', true]; }
       return ['緊締が効いて止まっている' + strong, false];
     };
-    const sev = b => b.hit ? 4 : b.over ? 3 : b.moved ? 2 : (b.air || b.z > .003) ? 1 : 0;
+    const sev = b => b.hit ? 4 : b.over ? 3 : (b.moved || Math.abs(b.lat.c) > .08 || Math.abs(b.lat.g) > .08) ? 2 : (b.air || b.z > .003) ? 1 : 0;
     const steady = (key, b, low) => {
       const [m, bd] = say(b, low), sv = sev(b), h = st.msgHold || (st.msgHold = {}), o = h[key];
       // 判定はチラつかせない：悪くなるときだけすぐ変える。急ブレーキ・衝突のあとは、いちばん悪かった結果を残す（何か操作するまで）。
@@ -1070,8 +1309,9 @@ for (const u of [BASE_IMG, PROBOX_IMG, IS_IMG]) { const im = new Image(); im.src
     };
     let msg = '', bad = false, msg2 = '', bad2 = false;
     if (t > .4) { [msg, bad] = steady('up', U, false); if (lowOn) { [msg2, bad2] = steady('low', D, true); msg2 = '下段：' + msg2; } }
-    simView = { theta: st.theta, shake: -sh.z * PXM, hit: U.hit, hitPt: U.hitPt, msg, bad, msg2, bad2, hit2: D.hit, hitPt2: D.hitPt, why };
+    simView = { lat: (st.ev && st.ev.k === 'curve') || [U.lat.c, U.lat.g, D.lat.c, D.lat.g].some(v => Math.abs(v) > .01) ? { up: U.lat, low: lowOn ? D.lat : null } : null, theta: st.theta, shake: -sh.z * PXM, hit: U.hit, hitPt: U.hitPt, msg, bad, msg2, bad2, hit2: D.hit, hitPt2: D.hitPt, why };
     render();
+    if (zoomAt && zoomAt.sim) refreshSimZoom();
     simAnim = requestAnimationFrame(simLoop);
   }
   // 固定のフックと、たるむワイヤー（試すときだけ）
@@ -1128,6 +1368,7 @@ for (const u of [BASE_IMG, PROBOX_IMG, IS_IMG]) { const im = new Image(); im.src
   }
   { const b = document.getElementById('roadRough'); b.onclick = () => { simTouched(); road = road.k === 'rough' ? ROAD[0] : ROAD[1]; b.setAttribute('aria-pressed', road.k === 'rough' ? 'true' : 'false'); }; }
   document.getElementById('simBrake').onclick = () => { if (simState) { simState.ev = { k: 'brake', t0: (performance.now() - simState.t0) / 1000 }; setEventButtons(); } };
+  for (const [id, k] of [['simAccel', 'accel'], ['simCurve', 'curve'], ['simBump', 'bump']]) document.getElementById(id).onclick = () => { if (simState) { simState.ev = { k, t0: (performance.now() - simState.t0) / 1000 }; setEventButtons(); } };
   document.getElementById('simCrash').onclick = () => { if (simState) { simState.ev = { k: 'crash', t0: (performance.now() - simState.t0) / 1000 }; setEventButtons(); } };
   // 上段・下段の緊締：タブを押すか、左右にスワイプして切りかえる
   { const pages = document.getElementById('lpages'), tabs = [document.getElementById('ltabUp'), document.getElementById('ltabLow')];
@@ -1151,13 +1392,634 @@ for (const u of [BASE_IMG, PROBOX_IMG, IS_IMG]) { const im = new Image(); im.src
   document.getElementById('simFront').oninput = e => { simF = e.target.value / 100; floorTouched(); };
   document.getElementById('simRear').oninput = e => { simR = e.target.value / 100; floorTouched(); };
 
+  // ── タイヤ固縛（2026-10-19 本人の依頼。かけ方は本人の写真とスリングベルトの説明に合わせた）──────────────
+  // ベルトをタイヤの上に回し（タイヤに当たるところはパッド）、接地点のすぐ前後で中間金具②③を荷台の穴に掛けて Ω（オメガ）形にする。
+  // 端は①フック、反対の端はラチェットと④フック。フックも中間金具も荷台の穴に差し込んで、裏側に引っ掛ける（浮かせて描かない）
+  const TC = { belt: '#2F6FD6', beltD: '#1C4A96', pad: '#9A6A45', metal: '#C3CAD0', metalD: '#4A535B', hole: '#0C442A', plate: '#3FA35A', tire: '#24292D', rim: '#BFC6CC' };
+  // 横から見たタイヤに描く。c＝タイヤの中心、r＝半径、ang＝床の角度、s＝ラチェットのある向き（+1＝図の右、−1＝図の左）
+  // o.ends＝[①の側, ④の側] の長さ（タイヤの中心から、半径の何倍）。ラチェットの側は、ない側の 2 倍まで伸ばして助手席のドアの真ん中あたりで掛ける（10/19 本人）
+  // o.floor＝タイヤの中心から床の面まで、o.ft＝床板の厚み、o.tight＝締め具合 0〜1、o.crank＝ラチェットを動かす 0〜1（3 回動かす）、
+  // o.arrows＝力の矢印 0〜1、o.labels＝①〜④と矢印の文字、o.stage＝かける途中（2＝タイヤに回す、3＝②③、4＝①、5 以上＝④とラチェット）、o.p＝その段の進み 0〜1
+  function tireStrap(parent, c, r, ang, s, o = {}) {
+    const F = o.floor ?? r, ft = o.ft ?? r * .16, tight = o.tight ?? 1, stage = o.stage ?? 9, p = o.p ?? 1, lab = !!o.labels;
+    const acc = css('--accent');
+    const g = el('g', { class: 'tstrap', 'pointer-events': 'none', transform: `translate(${c.x.toFixed(2)},${c.y.toFixed(2)}) rotate(${(ang * 180 / Math.PI).toFixed(2)})` }, parent);
+    const lw = Math.max(1.6, r * .085), fy = F - lw / 2;        // ベルトの太さ・床に寝ているベルトの高さ（ローカル：タイヤの中心が原点、下が＋）
+    const w = r * .55, R = r + lw * .55 + (1 - tight) * r * .07;  // ②③の位置（接地点の前後）、ベルトの回る半径（ゆるいと少し浮く）
+    const X = x => x * s;                                       // ラチェットが右のときの形を、向きに合わせて左右を返す
+    // ②③から、ベルトの円への外側の接点
+    const tan = side => { const px = side * w, d = Math.hypot(px, F), a = Math.atan2(F, px) - side * Math.acos(Math.min(1, R / d)); return { x: R * Math.cos(a), y: R * Math.sin(a) }; };
+    const tL = tan(-1), tR = tan(1);
+    const P = (x, y) => `${x.toFixed(2)},${y.toFixed(2)}`;
+    const line = (d, col, wd, extra = {}) => el('path', { d, fill: 'none', stroke: col, 'stroke-width': wd, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', ...extra }, g);
+    const hole = x => el('rect', { x: x - r * .08, y: F, width: r * .16, height: ft, fill: TC.hole }, g);
+    // J フック：穴に差し込んで、床板の裏で外向きに曲がって引っ掛かる。d＝外向き、q＝差し込み具合
+    const jhook = (x, d, q) => {
+      const dy = (1 - q) * (ft + r * .35);
+      line(`M${P(x, F - r * .05 - dy)} L${P(x, F + ft + r * .07 - dy)} Q${P(x, F + ft + r * .17 - dy)} ${P(x + d * r * .1, F + ft + r * .17 - dy)} L${P(x + d * r * .17, F + ft + r * .04 - dy)}`, TC.metalD, lw * .8);
+      el('path', { d: `M${P(x - d * r * .16, fy - dy)} L${P(x, F - r * .14 - dy)} L${P(x, fy + lw * .2 - dy)} Z`, fill: TC.metal, stroke: TC.metalD, 'stroke-width': lw * .3 }, g);   // ベルトの端の三角の金具
+    };
+    // 中間金具：ベルトを通す棒（横から見ると丸）と、穴に差して裏で引っ掛ける足
+    const mid = (x, q) => {
+      const dy = (1 - q) * (ft + r * .4), out = Math.sign(x);
+      line(`M${P(x, F - r * .06 - dy)} L${P(x, F + ft + r * .05 - dy)} L${P(x + out * r * .13, F + ft + r * .05 - dy)}`, TC.metalD, lw * .7);
+      el('circle', { cx: x, cy: F - r * .08 - dy, r: r * .085, fill: TC.metal, stroke: TC.metalD, 'stroke-width': lw * .35 }, g);
+    };
+    const num = (x, n) => { if (!lab) return; const y = F + ft + r * .48; el('circle', { cx: x, cy: y, r: r * .15, fill: css('--surface'), stroke: TC.beltD, 'stroke-width': lw * .4 }, g); const t = el('text', { x, y: y + r * .07, 'text-anchor': 'middle', 'font-size': r * .19, 'font-weight': 900, fill: TC.beltD }, g); t.textContent = n; };
+    if (stage < 2) return g;
+    // かけ始め：タイヤの上に回しただけ（まだどこにも掛けていない）
+    const drop = stage === 2 ? (1 - p) * r * .5 : 0;
+    const arc = `M${P(tL.x, tL.y - drop)} A${R.toFixed(2)},${R.toFixed(2)} 0 1 1 ${P(tR.x, tR.y - drop)}`;
+    const [e1, e4] = o.ends || [2.2, 4.4];
+    const hx1 = X(-r * e1), rx0 = X(r * (e4 - 1.1)), rx1 = X(r * (e4 - .5)), hx4 = X(r * e4);   // ラチェットは④フックの手前
+    if (stage >= 3) { hole(-w); hole(w); }
+    if (stage >= 4) hole(hx1);
+    if (stage >= 5) hole(hx4);
+    // ベルト（Ω）
+    const ends = stage === 2 ? `M${P(-w * 1.1, F - r * .3 - drop)} L${P(tL.x, tL.y - drop)}` + ` M${P(tR.x, tR.y - drop)} L${P(w * 1.1, F - r * .3 - drop)}` : `M${P(-w, fy)} L${P(tL.x, tL.y)} M${P(tR.x, tR.y)} L${P(w, fy)}`;
+    const op = stage === 2 ? { opacity: (.3 + .7 * p).toFixed(2) } : {};
+    line(arc, TC.pad, lw * 2.3, op);                            // パッド（タイヤに当たる側）
+    line(arc, TC.belt, lw * .8, { ...op, 'stroke-dasharray': `${(lw * 1.4).toFixed(1)} ${(lw * 1.1).toFixed(1)}` });
+    line(ends, TC.belt, lw, op);
+    // 締める前は、③とラチェットの間のベルトが少したるむ
+    const slack = (1 - tight) * r * .22;
+    if (stage >= 4) line(`M${P(X(-w), fy)} L${P(hx1, fy)}`, TC.belt, lw);
+    if (stage >= 5) {
+      line(`M${P(X(w), fy)} Q${P((X(w) + rx0) / 2, fy - slack)} ${P(rx0, fy)} L${P(hx4, fy)}`, TC.belt, lw);
+      // ラチェット（床に寝ている）。ハンドルを起こして倒すと巻き取る
+      const x0 = Math.min(rx0, rx1), h = r * .26;
+      el('rect', { x: x0, y: F - h, width: Math.abs(rx1 - rx0), height: h, rx: r * .04, fill: TC.metal, stroke: TC.metalD, 'stroke-width': lw * .35 }, g);
+      el('circle', { cx: X(r * (e4 - .95)), cy: F - h * .5, r: h * .38, fill: TC.belt, stroke: TC.metalD, 'stroke-width': lw * .3 }, g);   // 巻き取った軸
+      const elev = (18 + 52 * Math.abs(Math.sin(Math.PI * 3 * (o.crank || 0)))) * Math.PI / 180;
+      const pv = { x: X(r * (e4 - .57)), y: F - h * .8 }, L = r * .62;
+      line(`M${P(pv.x, pv.y)} L${P(pv.x - s * L * Math.cos(elev), pv.y - L * Math.sin(elev))}`, TC.metalD, lw * 1.1);
+    }
+    if (stage >= 3) { const q = stage === 3 ? p : 1; mid(-w, q); mid(w, q); }
+    if (stage >= 4) jhook(hx1, -s, stage === 4 ? p : 1);
+    if (stage >= 5) jhook(hx4, s, 1);
+    if (stage >= 3) { num(X(-w), '②'); num(X(w), '③'); }
+    if (stage >= 4) num(hx1, '①');
+    if (stage >= 5) num(hx4, '④');
+    // 力の矢印：太い＝タイヤを荷台に押しつける（主な力）、細い＝ラチェット側へわずかに引かれる
+    const a = o.arrows || 0;
+    if (a > 0) {
+      const ag = el('g', { opacity: a.toFixed(2) }, g), top = -R - lw;
+      const ax = X(-r * .14), bw = r * .2;
+      el('path', { d: `M${P(ax - bw / 2, top - r * .95)} L${P(ax + bw / 2, top - r * .95)} L${P(ax + bw / 2, top - r * .3)} L${P(ax + bw * 1.15, top - r * .3)} L${P(ax, top - r * .02)} L${P(ax - bw * 1.15, top - r * .3)} L${P(ax - bw / 2, top - r * .3)} Z`, fill: acc }, ag);
+      const ty = top - r * .62, tx0 = X(r * .12), tx1 = X(r * .62);
+      el('path', { d: `M${P(tx0, ty)} L${P(tx1 - s * r * .1, ty)}`, stroke: acc, 'stroke-width': r * .055, fill: 'none', 'stroke-linecap': 'round' }, ag);
+      el('path', { d: `M${P(tx1, ty)} L${P(tx1 - s * r * .14, ty - r * .08)} L${P(tx1 - s * r * .14, ty + r * .08)} Z`, fill: acc }, ag);
+      if (lab) {
+        const halo = { stroke: css('--surface'), 'stroke-width': r * .06, 'paint-order': 'stroke', 'stroke-linejoin': 'round' };   // 図の上でも読めるように縁どり
+        const t1 = el('text', { x: ax - s * r * .3, y: top - r * .55, 'text-anchor': s > 0 ? 'end' : 'start', 'font-size': r * .19, 'font-weight': 900, fill: acc, ...halo }, ag); t1.textContent = '押しつける力（大）';
+        const t2 = el('text', { x: tx1 + s * r * .06, y: ty - r * .12, 'text-anchor': s > 0 ? 'start' : 'end', 'font-size': r * .16, 'font-weight': 800, fill: acc, ...halo }, ag); t2.textContent = 'ラチェット側へ（小）';
+      }
+    }
+    return g;
+  }
+  // 穴あきの床（横から見た図。解説の図で使う）
+  function holesPattern(svg, id) {
+    const defs = el('defs', {}, svg), pt = el('pattern', { id, patternUnits: 'userSpaceOnUse', width: 12, height: 12 }, defs);
+    el('rect', { width: 12, height: 12, fill: TC.plate }, pt); el('circle', { cx: 6, cy: 6, r: 2.2, fill: TC.hole }, pt);
+  }
+  function floorSide(parent, x0, x1, F, ft, pid) {
+    el('rect', { x: x0, y: F, width: x1 - x0, height: ft, fill: `url(#${pid})`, stroke: '#0E5B2A', 'stroke-width': 1 }, parent);
+  }
+  // 手順と同じレクサス IS の絵（左が前）。前輪の中心を (cx, cy)、タイヤの半径を r にそろえて描く（解説の図。10/19 本人：絵を統一）。
+  // 返すのは車体の下の端（バンパー・ドアの下。絵で測ると前輪の中心から半径の 0.61 倍下）と、タイヤハウスの半分の幅（V 字のベルトが当たるかを見る）
+  function isSide(parent, cx, cy, r) {
+    const k = CAR.is, sc = r / k.r;
+    el('image', { href: IS_IMG, x: cx - k.wheels[0][0] * sc, y: cy - k.wheels[0][1] * sc, width: k.w * sc, height: k.h * sc, preserveAspectRatio: 'none' }, parent);
+    return { rk: cy + .61 * r, archX: r * 1.0 };
+  }
+  // 上から見た小さな図（小窓と解説）：真上の図の絵（トラックと車）の、その車のまわりを切り出す（10/19 本人：手描きの図は使わない）。
+  // o.key＝'up'（プロボックス・前がゲート側）|'low'（レクサス IS・前がキャビン側）、o.lash＝[{ w: 'LF'|'RF'|'LR'|'RR', d: −1|+1（締める向き。図の左右）, t: 文字 }]、o.ends＝[左の文字, 右の文字]
+  function tireTopSvg(o) {
+    const P = TCARS[o.key], [img, x0, y0, w, h] = P.img, c = TP(P.rest.x, P.rest.y), vx = c.x - 360;
+    const halo = `stroke="#FFFFFF" stroke-width="8" paint-order="stroke" stroke-linejoin="round"`;
+    let s = `<svg class="tzoomtop" viewBox="${vx} 28 720 484" role="img" aria-label="${o.aria || '上から見た図'}">`;
+    s += `<image href="${TOP_TRUCK}" x="0" y="0" width="1418" height="517"/>`;
+    if (o.key === 'up') s += `<image href="${TOP_RAMPS}" x="0" y="0" width="1418" height="517"/>`;
+    s += `<image href="${img}" x="${x0}" y="${y0}" width="${w}" height="${h}"/>`;
+    // 車輪は車体の下に隠れているので、場所が分かるように重ねて描く
+    for (const k of TWH) { const [lx, ly] = twp(P, k), q = TP(P.rest.x + lx, P.rest.y + ly); s += `<rect x="${q.x - 40}" y="${q.y - 14}" width="80" height="28" rx="8" fill="${TC.tire}" opacity=".85" stroke="#FFFFFF" stroke-width="2"/>`; }
+    for (const L of o.lash) {
+      const [lx, ly] = twp(P, L.w), a = TP(P.rest.x + lx, P.rest.y + ly), d = L.d, ay = ly > 0 ? a.y + 64 : a.y - 64, ty = ly > 0 ? a.y + 112 : a.y - 86;
+      s += `<path d="M${a.x - d * 88},${a.y} L${a.x + d * 177},${a.y}" fill="none" stroke="${TC.belt}" stroke-width="12" stroke-linecap="round"/>`;
+      s += `<rect x="${a.x + d * 140 - 14}" y="${a.y - 10}" width="28" height="20" rx="4" fill="${TC.metal}" stroke="${TC.metalD}" stroke-width="2"/>`;
+      for (const hx of [a.x - d * 88, a.x - 23, a.x + 23, a.x + d * 177]) s += `<circle cx="${hx}" cy="${a.y}" r="6" fill="${TC.metalD}"/>`;
+      s += `<circle cx="${a.x}" cy="${a.y}" r="50" fill="none" stroke="var(--accent)" stroke-width="6" stroke-dasharray="13 9"/>`;
+      s += `<line x1="${a.x}" y1="${ay}" x2="${a.x + d * 110}" y2="${ay}" stroke="var(--accent)" stroke-width="9" ${halo.replace('8', '14')}/><path d="M${a.x + d * 138},${ay} L${a.x + d * 106},${ay - 17} L${a.x + d * 106},${ay + 17} Z" fill="var(--accent)" stroke="#FFFFFF" stroke-width="3"/>`;
+      s += `<text x="${a.x + d * 50}" y="${ty}" text-anchor="middle" font-size="34" font-weight="900" fill="#141A12" ${halo}>${L.t}</text>`;
+    }
+    if (o.ends) s += `<text x="${vx + 12}" y="504" font-size="28" font-weight="800" fill="#141A12" ${halo}>${o.ends[0]}</text><text x="${vx + 708}" y="504" text-anchor="end" font-size="28" font-weight="800" fill="#141A12" ${halo}>${o.ends[1]}</text>`;
+    return s + '</svg>';
+  }
+  // 手順の図で描く車輪：上段（プロボックス・バックで積む）は運転席側の前輪（ゲート側）と助手席側の後輪（キャビン側）、
+  // 下段（レクサス IS）は助手席側の前輪（キャビン側）と運転席側の後輪（ゲート側）の対角 2 輪（10/19 本人）。
+  // 図は助手席側から見ているので、手前（見えている）は上段＝ゲート側の車輪、下段＝キャビン側の車輪。奥は描かない（小窓で説明）。
+  // 締める向き：ゲート側に引くほどフロアがないので、ゲート側の車輪はキャビン側へ、キャビン側の車輪はゲート側へ（内向き。10/19 本人）
+  const TIRE_NEAR = { up: 1, low: 0 };   // 車輪を x の小さい順（キャビン側から）に並べたときの手前の番号
+  const TIRE_NAME = {
+    up: { near: '運転席側の前輪', nearAt: 'ゲート側の車輪', nearTo: 'キャビン側', far: '助手席側の後輪', farAt: 'キャビン側の車輪', farTo: 'ゲート側' },
+    low: { near: '助手席側の前輪', nearAt: 'キャビン側の車輪', nearTo: 'ゲート側', far: '運転席側の後輪', farAt: 'ゲート側の車輪', farTo: 'キャビン側' },
+  };
+  const TIRE_TOP = {
+    up: { key: 'up', aria: '上段の車を上から見た図。手前の運転席側の前輪と、奥の助手席側の後輪の対角', lash: [{ w: 'RF', d: -1, t: '手前：キャビン側へ' }, { w: 'LR', d: 1, t: '奥：ゲート側へ' }], ends: ['← キャビン側', 'ゲート側 →'] },
+    low: { key: 'low', aria: '下段の車を上から見た図。手前の助手席側の前輪と、奥の運転席側の後輪の対角', lash: [{ w: 'LF', d: 1, t: '手前：ゲート側へ' }, { w: 'RR', d: -1, t: '奥：キャビン側へ' }], ends: ['← キャビン側', 'ゲート側 →'] },
+  };
+  let tireMode = false;   // 手順 12・18 の「タイヤ固縛の場合」
+  const tireHere = car => !simMode && tireMode && S[idx].hi === (car === 'up' ? 'wireU' : 'wireL');
+  // 手順の図の車に、手前の車輪のタイヤ固縛を描く（ワイヤーの代わり）。ft＝床板の厚み、floorOff＝車の置き場所から床の面まで
+  function tireOnCar(svg, car, carObj, ft, floorOff) {
+    const ws = carObj.wheels.slice().sort((a, b) => a.x - b.x);
+    lastWheels[car] = ws.map((w, i) => ({ x: w.x, y: w.y, r: carObj.rPx, ang: carObj.ang, s: i === 1 ? -1 : 1, ft, floor: carObj.rPx + floorOff, tire: true, near: i === TIRE_NEAR[car] }));
+    const w = lastWheels[car][TIRE_NEAR[car]];
+    tireStrap(svg, w, w.r, w.ang, w.s, { ft: w.ft, floor: w.floor });
+  }
+
+  // ── タイヤ固縛の小窓（手順 12・18 のタイヤを押す）：Ω と①〜④、ラチェットを締める動き、力の矢印、反対側（奥）の車輪 ──
+  let tzAnim = 0;
+  function refreshTireZoom() {
+    const { car, i } = zoomAt, w = (lastWheels[car] || [])[i];
+    if (!w || !w.tire) { closeZoom(); return; }
+    const nm = TIRE_NAME[car];
+    const zs = document.getElementById('zoomSvg');
+    zs.innerHTML = document.getElementById('truck').innerHTML;
+    zs.querySelectorAll('animate').forEach(x => x.parentNode.remove());
+    zs.querySelectorAll('.tstrap').forEach(x => x.remove());
+    { const cx = w.x + w.s * w.r * 1.1 * Math.cos(w.ang); zs.setAttribute('viewBox', `${(cx - 150).toFixed(1)} ${(w.y - 100).toFixed(1)} 300 188`); }   // ①から④まで入るように、ラチェットの側へ寄せて広く
+    const lay = el('g', {}, zs);
+    document.getElementById('zoomTitle').textContent = (car === 'up' ? '上段' : '下段') + '・タイヤ固縛（' + nm.near + '）';
+    const m = document.getElementById('zoomMsg'); m.classList.remove('bad');
+    m.textContent = `手前の${nm.near}（${nm.nearAt}）に、ベルトを Ω 形にかけて${nm.nearTo}へ締めます。太い矢印はタイヤを荷台に押しつける力（ほとんどがこれ）、細い矢印はラチェット側へ少しだけ引かれる力です。`;
+    document.getElementById('zoomWhy').hidden = true;
+    const ex = document.getElementById('zoomExp'); ex.hidden = false; ex.style.background = 'var(--accent-soft)';
+    ex.innerHTML = tireTopSvg(TIRE_TOP[car]) +
+      `<p class="tzoomtxt">奥（反対側）の<b>${nm.far}</b>（${nm.farAt}）にもかけます。手前と<b>対角</b>の 2 輪で、締める向きを<b>逆</b>（${nm.farTo}へ）にして、ラチェット側へ寄る力を打ち消します。</p>` +
+      `<p class="tzoomtxt">跳ねるのが怖いときは、タイヤ固縛に<b>ワイヤー緊締をプラス</b>して、跳ねるのを抑えます。</p>`;
+    const box = document.getElementById('zoomBtns'); box.innerHTML = ''; box.style.gridTemplateColumns = '1fr 1fr';
+    for (const [n, f] of [['もう一度締める', refreshTireZoom], ['解説を見る', openTireExplain]]) { const b = document.createElement('button'); b.className = 'chip'; b.type = 'button'; b.textContent = n; b.onclick = f; box.appendChild(b); }
+    // ラチェットを締める動き → 締め終わったら力の矢印
+    cancelAnimationFrame(tzAnim);
+    const draw = (tight, crank, arrows) => { lay.textContent = ''; tireStrap(lay, w, w.r, w.ang, w.s, { ft: w.ft, floor: w.floor, tight, crank, arrows, labels: true }); };
+    if (reduce) { draw(1, 0, 1); return; }
+    const t0 = performance.now();
+    const step = now => { if (!zoomAt) return; const t = (now - t0) / 1000, k = clamp(t / 1.8, 0, 1); draw(k, k, clamp((t - 1.9) / .4, 0, 1)); if (t < 2.4) tzAnim = requestAnimationFrame(step); };
+    tzAnim = requestAnimationFrame(step);
+  }
+
+  // ── タイヤ固縛の解説（共通の画面。手順 12・18、小窓、タイヤ固縛編の「解説」から開く。「戻る」で元の画面へ）──
+  const TEXP_CAP = [
+    'タイヤが荷台（穴のあいたフロア）に乗っています。図は横から見たところで、<b>左が車の前</b>です。',
+    'ベルトをタイヤの上に回します。タイヤに当たるところは<b>パッド</b>になっています。',
+    'タイヤが荷台に着いているところの<b>すぐ前とすぐ後ろ</b>で、中間金具<b>②③</b>を荷台の穴に掛けます。ベルトが横から見て <b>Ω（オメガ）</b>の形になります。',
+    '前側の端の<b>①フック</b>を荷台の穴に差し込んで、裏側に引っ掛けます。',
+    '後ろ側の<b>④フック</b>（ラチェットの側）を荷台に掛けて、<b>ラチェットで締め込みます</b>。',
+    '締め込むと、タイヤが荷台に<b>下向きに押しつけられます</b>（太い矢印）。ラチェット側へも<b>少しだけ</b>引かれます（細い矢印）。',
+  ];
+  let texpK = 1, texpAnim = 0;
+  function openTireExplain() {
+    let ov = document.getElementById('tireExp');
+    if (!ov) {
+      ov = document.createElement('div'); ov.id = 'tireExp'; ov.className = 'texp';
+      ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true'); ov.setAttribute('aria-label', 'タイヤ固縛の解説');
+      const ex4 = { key: 'low', aria: '4 輪：前 2 輪は前へ、後ろ 2 輪は後ろへ', lash: [{ w: 'LF', d: -1, t: '前へ' }, { w: 'RF', d: -1, t: '前へ' }, { w: 'LR', d: 1, t: '後ろへ' }, { w: 'RR', d: 1, t: '後ろへ' }], ends: ['← 車の前', '車の後ろ →'] };
+      const ex2 = { key: 'low', aria: '対角 2 輪：左前輪は前へ、右後輪は後ろへ', lash: [{ w: 'LF', d: -1, t: '左前輪：前へ' }, { w: 'RR', d: 1, t: '右後輪：後ろへ' }], ends: ['← 車の前', '車の後ろ →'] };
+      ov.innerHTML = `<div class="texpin">
+        <div class="texphd"><b>タイヤ固縛の解説</b><button class="btn" type="button" id="texpClose">戻る</button></div>
+        <section class="panel"><h2>タイヤ固縛のかけ方</h2>
+          <svg class="diagram" id="texpSvg" viewBox="0 0 360 240" role="img" aria-label="タイヤを横から見た図。左が車の前"></svg>
+          <p class="cap" id="texpCap" aria-live="polite"></p>
+          <div class="nav"><button class="btn" type="button" id="texpPrev">← 前へ</button><span class="count" id="texpCount"></span><button class="btn primary" type="button" id="texpNext">次へ →</button></div>
+          <p class="note">フックは 4 つ：①前側の端のフック、②③中間金具（Ω のくびれ）、④ラチェット側の端のフック。どれも荷台の穴に差し込んで、裏側に引っ掛けます。</p>
+        </section>
+        <section class="panel"><h2>なぜ Ω（オメガ）形にするの？</h2>
+          <svg class="diagram" id="texpCmp" viewBox="0 0 360 172" role="img" aria-label="左は Ω 形でタイヤだけを包む。右は V 字でベルトがバンパーに当たる"></svg>
+          <div class="figlabel">左：Ω 形（中間金具あり）　右：V 字（中間金具なし）</div>
+          <ul>
+            <li>中間金具②③で、タイヤが荷台に着いているところの<b>前後を押さえる</b>ので、ベルトが<b>タイヤだけ</b>を包みます。バンパー・フェンダー・エアロなど<b>車体に触れません</b>。</li>
+            <li>ベルトがタイヤの上から<b>ほぼ真下</b>に降りるので、締める力の大半が「<b>タイヤを荷台に押しつける力</b>」になります。</li>
+            <li>タイヤの<b>前と後ろの両方</b>から押さえるので、前にも後ろにも<b>転がりにくく</b>なります。</li>
+            <li>中間金具なしで遠くのフックに直接掛けると <b>V 字（三角形）</b>になります。タイヤを斜め横に引くだけで押さえが弱く、ベルトが<b>車体に当たり</b>やすくなります。</li>
+          </ul>
+        </section>
+        <section class="panel"><h2>締め込むと、どちらに引っ張られる？</h2>
+          <ul>
+            <li>力の<b>大部分は下向き</b>です。前と後ろへの力は、ほぼ打ち消し合います。</li>
+            <li>ただし<b>ゼロではありません</b>。締め込むとき、ベルトがタイヤの表面や中間金具とこすれながら滑るので、<b>ラチェット側の張りがわずかに強く</b>なり、タイヤの上がラチェット側に引かれます。車は<b>わずかにラチェット側へ寄ろう</b>とします。</li>
+            <li>だから<b>対角の 2 輪で、締める向きを逆</b>にして、偏りを打ち消します（例：左前輪は前へ、右後輪は後ろへ）。</li>
+            <li><b>4 輪</b>すべてにかけるときは、前 2 輪を前へ、後ろ 2 輪を後ろへ（外向き）締めると、前後左右とも釣り合います。</li>
+          </ul>
+          ${tireTopSvg(ex2)}<div class="figlabel">対角 2 輪（例）。上から見た図で、図の下が車の左</div>
+          ${tireTopSvg(ex4)}<div class="figlabel">4 輪（外向き）</div>
+          <p>この積載車では、ゲート側に引くほどフロアがないので、<b>ゲート側の車輪はキャビン側へ、キャビン側の車輪はゲート側へ</b>締めます（内向き）。対角で向きが逆なので、これでも打ち消し合います。</p>
+          ${tireTopSvg(TIRE_TOP.up)}<div class="figlabel">上段（プロボックス・バックで積むので前がゲート側）</div>
+          ${tireTopSvg(TIRE_TOP.low)}<div class="figlabel">下段（レクサス IS）</div>
+          <div class="tip">実際の手順・本数は、<b>荷台とベルトのメーカーの取扱説明書</b>に従ってください。</div>
+        </section>
+        <section class="panel"><h2>ワイヤー緊締とのちがい</h2>
+          <ul>
+            <li><b>ワイヤー緊締</b>は車体（ボディ）を引いているので、<b>上下の動きに強い</b>です。</li>
+            <li><b>タイヤ固縛</b>はタイヤを荷台に止めているだけなので、サスペンションから上の<b>車体の上下の動きは押さえられません</b>。</li>
+            <li>その代わり、タイヤ固縛は<b>車体を傷つけにくく</b>、サスペンションが動いても<b>緩みにくい</b>です。</li>
+          </ul>
+          <div class="warn"><strong>⚠ 跳ねるのが怖いとき</strong><span>タイヤ固縛に<b>ワイヤー緊締をプラス</b>して、跳ねるのを抑えます。</span></div>
+        </section>
+      </div>`;
+      document.body.appendChild(ov);
+      document.getElementById('texpClose').onclick = closeTireExplain;
+      document.getElementById('texpPrev').onclick = () => texpGo(texpK - 1);
+      document.getElementById('texpNext').onclick = () => texpGo(texpK + 1);
+    }
+    ov.hidden = false; ov.scrollTop = 0;
+    texpCompare();
+    texpGo(1);
+  }
+  function closeTireExplain() { cancelAnimationFrame(texpAnim); const ov = document.getElementById('tireExp'); if (ov) ov.hidden = true; }
+  function texpGo(k) {
+    texpK = clamp(k, 1, TEXP_CAP.length);
+    document.getElementById('texpCap').innerHTML = `${texpK}. ${TEXP_CAP[texpK - 1]}`;
+    document.getElementById('texpCount').textContent = `${texpK} / ${TEXP_CAP.length}`;
+    document.getElementById('texpPrev').disabled = texpK === 1;
+    document.getElementById('texpNext').disabled = texpK === TEXP_CAP.length;
+    cancelAnimationFrame(texpAnim);
+    const dur = texpK === 5 ? 2200 : 900, t0 = performance.now();
+    const step = now => { const p = reduce ? 1 : clamp((now - t0) / dur, 0, 1); texpDraw(texpK, p); if (p < 1) texpAnim = requestAnimationFrame(step); };
+    texpAnim = requestAnimationFrame(step);
+  }
+  function texpDraw(k, p) {
+    const svg = document.getElementById('texpSvg'); svg.textContent = '';
+    holesPattern(svg, 'hpTexp');
+    const cx = 124, cy = 120, r = 48, F = cy + r, ft = 12;   // ①（左へ半径の 2.2 倍）から④（右へ 4.4 倍）まで入るように
+    isSide(svg, cx, cy, r);
+    floorSide(svg, 0, 360, F, ft, 'hpTexp');
+    if (k >= 2) tireStrap(svg, { x: cx, y: cy }, r, 0, 1, { ft, stage: Math.min(k, 5), p: k <= 5 ? p : 1, tight: k < 5 ? 0 : k === 5 ? p : 1, crank: k === 5 ? p : 0, arrows: k === 6 ? p : 0, labels: true });
+    if (k === 3 && p > .5) { const t = el('text', { x: cx + r * 1.5, y: cy - r * .7, 'font-size': 30, 'font-weight': 900, fill: TC.beltD, opacity: ((p - .5) * 2).toFixed(2) }, svg); t.textContent = 'Ω'; }
+    const t1 = el('text', { x: 6, y: 236, 'font-size': 11, 'font-weight': 700, fill: css('--muted') }, svg); t1.textContent = '← 車の前';
+    const t2 = el('text', { x: 354, y: 236, 'text-anchor': 'end', 'font-size': 11, 'font-weight': 700, fill: css('--muted') }, svg); t2.textContent = '車の後ろ →';
+  }
+  // Ω と V 字のくらべ
+  function texpCompare() {
+    const svg = document.getElementById('texpCmp'); svg.textContent = '';
+    holesPattern(svg, 'hpCmp');
+    const r = 36, cy = 100, F = cy + r, ft = 10, acc = css('--accent'), bad = css('--danger');
+    for (const [ox, kind] of [[0, 'omega'], [180, 'v']]) {
+      const pane = el('svg', { x: ox, y: 0, width: 180, height: 172, viewBox: '0 0 180 172', overflow: 'hidden' }, svg);
+      const cx = 90;
+      const b = isSide(pane, cx, cy, r);
+      floorSide(pane, 0, 180, F, ft, 'hpCmp');
+      if (kind === 'omega') {
+        tireStrap(pane, { x: cx, y: cy }, r, 0, 1, { ft, arrows: 1, ends: [1.1, 2.2] });   // くらべの図は狭いので短く（割合は同じ 1：2）
+        const t = el('text', { x: 90, y: 18, 'text-anchor': 'middle', 'font-size': 13, 'font-weight': 900, fill: acc , stroke: css('--surface'), 'stroke-width': 4, 'paint-order': 'stroke', 'stroke-linejoin': 'round' }, pane); t.textContent = '✓ タイヤだけを包む';
+      } else {
+        // 中間金具なし：遠くのフックからタイヤの上へ、まっすぐ（V 字）。バンパーの下の端を横切る
+        const R = r + 2, lw = 3.4, hx = r * 2.3;
+        const tp = side => { const px = side * hx, d = Math.hypot(px, r), a = Math.atan2(r, px) - side * Math.acos(R / d); return { x: cx + R * Math.cos(a), y: cy + R * Math.sin(a) }; };
+        const L = tp(-1), Rt = tp(1);
+        const vArc = `M${L.x},${L.y} A${R},${R} 0 0 1 ${Rt.x},${Rt.y}`;
+        el('path', { d: vArc, fill: 'none', stroke: TC.pad, 'stroke-width': lw * 2.2 }, pane);
+        el('path', { d: vArc, fill: 'none', stroke: TC.belt, 'stroke-width': lw * .8, 'stroke-dasharray': '5 4' }, pane);
+        for (const [h, t] of [[{ x: cx - hx, y: F - lw / 2 }, L], [{ x: cx + hx, y: F - lw / 2 }, Rt]]) {
+          el('line', { x1: h.x, y1: h.y, x2: t.x, y2: t.y, stroke: TC.belt, 'stroke-width': lw, 'stroke-linecap': 'round' }, pane);
+          el('rect', { x: h.x - 3, y: F, width: 6, height: ft, fill: TC.hole }, pane);
+          // バンパーの下の端（車体の下の線）を横切る所に ✗
+          const q = (b.rk - h.y) / (t.y - h.y), x = h.x + q * (t.x - h.x);
+          if (q > 0 && q < 1 && Math.abs(x - cx) > b.archX) el('circle', { cx: x, cy: b.rk, r: 9, fill: 'none', stroke: bad, 'stroke-width': 3 }, pane);
+          // 斜め横に引く矢印
+          const ux = (h.x - t.x), uy = (h.y - t.y), n = Math.hypot(ux, uy);
+          el('line', { x1: t.x, y1: t.y, x2: t.x + ux / n * 22, y2: t.y + uy / n * 22, stroke: acc, 'stroke-width': 2.5, 'stroke-linecap': 'round' }, pane);
+        }
+        const t = el('text', { x: 90, y: 18, 'text-anchor': 'middle', 'font-size': 13, 'font-weight': 900, fill: bad , stroke: css('--surface'), 'stroke-width': 4, 'paint-order': 'stroke', 'stroke-linejoin': 'round' }, pane); t.textContent = '✗ 車体に当たる';
+        const t2 = el('text', { x: 90, y: 34, 'text-anchor': 'middle', 'font-size': 10.5, 'font-weight': 700, fill: acc , stroke: css('--surface'), 'stroke-width': 4, 'paint-order': 'stroke', 'stroke-linejoin': 'round' }, pane); t2.textContent = '斜め横に引くだけ';
+      }
+    }
+  }
+
+  // ── タイヤ固縛を試す（2026-10-19）：上段・下段の車（下段は積むかどうか選ぶ）。見る＝横から（トラックの側面図）／上から（真上の図）──────
+  // 単位は m・s。シフトはニュートラル（P やサイドブレーキが効いていないときの動き）。フロアは水平として計算する。
+  // 固縛していない車輪は、前後は転がり（転がり抵抗 0.015）、横はすべる（鋼の網で 0.25）。固縛した車輪は、ベルトとタイヤのたわみで
+  // 少しだけ動くばね（1 G で約 3 cm）。ワイヤー（車体）は 4 か所のばね。急ブレーキ 0.85 G・急加速 0.3 G・カーブ 0.5 G（外側へ）。
+  // 段差は高さ 5 cm：固縛していない車輪が浮き、ボディはサスペンションで揺れる（タイヤ固縛では止まらない）。上下は 3 倍にして描く。前後左右は実寸。
+  // 位置は真上の図のトラック（1 m＝126 px、前の端 x=99・真ん中 y=258.5）で、トラックの前の端から m（x）と、真ん中から m（y、図の下が＋）。
+  const TNAME = { LF: '左前輪', RF: '右前輪', LR: '左後輪', RR: '右後輪' };
+  const TWH = ['RF', 'LF', 'RR', 'LR'];
+  const TPX = 126, TOX = 99, TOY = 258.5, T_MU = .25, T_GAIN = 3, T_WK = 1.5e5, T_WC = 4e3;
+  const TP = (x, y) => ({ x: TOX + x * TPX, y: TOY + y * TPX });   // m → 上から見た図の座標
+  // 車ごとの決まり。faces＝車の前が向く方（cab＝キャビン側＝図の左、rear＝ゲート側＝図の右）、img＝真上の図の絵と置き場所（左上と大きさ）
+  //  上段＝プロボックス（約 1,150 kg、バックで積む）。道板は 2.3〜7.15 m、左右の道板は真ん中から 0.5〜1.0 m。キャビン（2.1 m）に当たる・道板から落ちる
+  //  下段＝レクサス IS（約 1,600 kg）。前はキャビンの後ろの柱（2.75 m）、後ろはリアゲート（9.7 m）、横はフロアの端（±1.15 m）
+  const TCARS = {
+    up: { name: '上段', m: 1150, I: 1150 * (4.245 ** 2 + 1.69 ** 2) / 12, hl: 2.12, hw: .845, wb: 2.55, tr: 1.43, faces: 'rear', rest: { x: 4.47, y: 0 }, img: [TOP_PROBOX, 395, 137, 535, 245] },
+    low: { name: '下段', m: 1600, I: 1600 * (4.71 ** 2 + 1.84 ** 2) / 12, hl: 2.355, hw: .92, wb: 2.8, tr: 1.56, faces: 'cab', rest: { x: 7.055, y: 0 }, img: [TOP_IS, 691, 127, 594, 260] },
+  };
+  // 横から見た図（助手席側）で見える車輪。キャビン側から順に（上段はバックで積むので、見えるのは車の右＝運転席側）
+  const TSIDE_KEYS = { up: ['RR', 'RF'], low: ['LF', 'LR'] };
+  // 車輪の場所（車の真ん中から、図の向きで m）。車の左は、前が左（キャビン側）なら図の下、前が右なら図の上
+  function twp(P, k) { const f = P.faces === 'cab' ? -1 : 1; return [(k[1] === 'F' ? 1 : -1) * f * P.wb / 2, (k[0] === 'L' ? 1 : -1) * -f * P.tr / 2]; }
+  // 開いたときは、手順の図と同じ対角（上段＝運転席側の前輪と助手席側の後輪、下段＝助手席側の前輪と運転席側の後輪）
+  const tSel = { up: new Set(['RF', 'LR']), low: new Set(['LF', 'RR']) }, tWire = { up: false, low: false };
+  let tLowOn = true, tView = 'top', tTab = 'up', tState = null, tAnim = 0, tSideOn = null;
+  const tNames = ks => ks.map(k => TNAME[k]).join('・');
+  function tBody() { return { x: 0, y: 0, th: 0, vx: 0, vy: 0, w: 0, hop: { LF: [0, 0], RF: [0, 0], LR: [0, 0], RR: [0, 0] }, bz: 0, bv: 0, hit: null }; }
+  function tNew() { const n = performance.now(); return { t0: n, last: n, ev: null, cars: { up: tBody(), low: tBody() } }; }
+  const tKeys = () => tLowOn ? ['up', 'low'] : ['up'];
+  // 車輪のずれ（置いた位置から m）と速さ
+  function tWheel(P, B, k) {
+    const [lx, ly] = twp(P, k), c = Math.cos(B.th), s = Math.sin(B.th), rx = lx * c - ly * s, ry = lx * s + ly * c;
+    return { rx, ry, x: B.x + rx - lx, y: B.y + ry - ly, vx: B.vx - B.w * ry, vy: B.vy + B.w * rx };
+  }
+  function tAcc(ev, t) {
+    if (!ev) return { x: 0, y: 0 };
+    const s = t - ev.t0, on = (a, b, e) => clamp((s - a) / b, 0, 1) * (1 - clamp((s - e) / b, 0, 1));
+    if (ev.k === 'brake') return { x: -.85 * GV * on(0, .2, 2.0), y: 0 };
+    if (ev.k === 'accel') return { x: .3 * GV * on(0, .3, 2.2), y: 0 };
+    if (ev.k === 'curve') return { x: 0, y: -.5 * GV * on(0, .5, 2.2) };
+    return { x: 0, y: 0 };
+  }
+  function tStep(key, B, a, dt) {
+    const P = TCARS[key], sel = tSel[key], c = Math.cos(B.th), s = Math.sin(B.th), N = P.m * GV / 4;
+    const K = 2.5e5 * P.m / 1600, C = 6e3 * Math.sqrt(P.m / 1600);   // 固縛のばね（1 G で約 3 cm）
+    let Fx = P.m * a.x, Fy = P.m * a.y, M = 0;
+    for (const k of TWH) {
+      const q = tWheel(P, B, k), air = B.hop[k][0] > .002;
+      let fx = 0, fy = 0;
+      if (sel.has(k)) { fx -= K * q.x + C * q.vx; fy -= K * q.y + C * q.vy; }
+      if (tWire[key]) { fx -= T_WK * q.x + T_WC * q.vx; fy -= T_WK * q.y + T_WC * q.vy; }
+      if (!sel.has(k) && !air) {
+        const vl = q.vx * c + q.vy * s, vt = -q.vx * s + q.vy * c;
+        const fl = -ROLL * N * Math.tanh(vl / .01), fw = -T_MU * N * Math.tanh(vt / .003);
+        fx += fl * c - fw * s; fy += fl * s + fw * c;
+      }
+      Fx += fx; Fy += fy; M += q.rx * fy - q.ry * fx;
+    }
+    B.vx += Fx / P.m * dt; B.vy += Fy / P.m * dt; B.w += M / P.I * dt;
+    B.x += B.vx * dt; B.y += B.vy * dt; B.th += B.w * dt;
+  }
+  // 当たり・落ちる：上段はキャビン・道板の端（ゲート側）・道板の横、下段は柱・リアゲート・フロアの横の端
+  function tHit(key, B) {
+    const P = TCARS[key], c = Math.cos(B.th), s = Math.sin(B.th);
+    for (const [lx, ly] of [[-P.hl, -P.hw], [-P.hl, P.hw], [P.hl, -P.hw], [P.hl, P.hw]]) {
+      const x = P.rest.x + B.x + lx * c - ly * s, y = P.rest.y + B.y + lx * s + ly * c;
+      if (key === 'up' && x < 2.1) return { k: 'cab', x: 2.1, y };
+      if (key === 'low' && x < 2.75) return { k: 'front', x: 2.75, y };
+      if (key === 'low' && x > 9.7) return { k: 'rear', x: 9.7, y };
+    }
+    for (const k of TWH) {
+      const q = tWheel(P, B, k), [lx, ly] = twp(P, k), x = P.rest.x + lx + q.x, y = P.rest.y + ly + q.y;
+      if (key === 'up' && x > 7.15) return { k: 'end', x, y };
+      if (key === 'up' && (Math.abs(y) > 1.0 || Math.abs(y) < .5)) return { k: 'side', x, y };
+      if (key === 'low' && Math.abs(y) > 1.15) return { k: 'side', x, y };
+    }
+    return null;
+  }
+  function tLoop(now) {
+    const S = tState; if (!S) return;
+    const dtAll = Math.min(.05, (now - S.last) / 1000); S.last = now;
+    const t = (now - S.t0) / 1000, ev = S.ev;
+    for (const key of tKeys()) {
+      const B = S.cars[key], sel = tSel[key];
+      if (!B.hit) {
+        const n = Math.ceil(dtAll / .0005), dt = dtAll / n;
+        for (let i = 0; i < n; i++) { tStep(key, B, tAcc(ev, t - dtAll + dt * (i + 1)), dt); const h = tHit(key, B); if (h) { B.hit = h; B.vx = B.vy = B.w = 0; break; } }
+      }
+      // 段差：前輪が先、0.25 秒あとに後輪（トラックの前のほうの車輪＝キャビン側の車輪が先）
+      if (ev && ev.k === 'bump') for (const [side, t1] of [['cab', .1], ['gate', .35]]) if (!ev[key + side] && t - ev.t0 > t1) {
+        ev[key + side] = true;
+        for (const k of TWH) if ((twp(TCARS[key], k)[0] < 0) === (side === 'cab') && !sel.has(k)) B.hop[k][1] = tWire[key] ? .15 : 1.0;   // 固縛していない車輪が浮く
+        B.bv += tWire[key] ? .2 : .55;                                                                                               // ボディはサスペンションで揺れる
+      }
+      for (const k of TWH) { const h = B.hop[k]; if (h[1] || h[0] > 0) { h[1] -= GV * dtAll; h[0] += h[1] * dtAll; if (h[0] <= 0) { h[0] = 0; h[1] = 0; } } }
+      { const w = 2 * Math.PI * 1.4; B.bv += (-w * w * B.bz - 2 * .25 * w * B.bv) * dtAll; B.bz += B.bv * dtAll; }
+      if (ev) {
+        const m = ev.m[key];
+        m.maxTh = Math.max(m.maxTh, Math.abs(B.th));
+        for (const k of TWH) { const q = tWheel(TCARS[key], B, k); m.maxD[k] = Math.max(m.maxD[k], Math.hypot(q.x, q.y)); m.maxHop[k] = Math.max(m.maxHop[k], B.hop[k][0]); }
+      }
+    }
+    if (ev && !ev.done && t - ev.t0 > 3.4) { ev.done = true; tButtons(); }
+    tRender(t);
+    if (zoomAt && zoomAt.sim) refreshSimZoom();
+    tAnim = requestAnimationFrame(tLoop);
+  }
+  function tStart() { cancelAnimationFrame(tAnim); tState = tNew(); tButtons(); tAnim = requestAnimationFrame(tLoop); }
+  function tStop() { cancelAnimationFrame(tAnim); tState = null; }
+  function tButtons() { const busy = !!tState?.ev && !tState.ev.done; for (const id of ['tBrake', 'tAccel', 'tCurve', 'tBump']) document.getElementById(id).disabled = busy; }
+  function tEvent(k) {
+    if (!tState || (tState.ev && !tState.ev.done)) return;
+    // 当たって止まった車は、元の位置から始める
+    for (const key of ['up', 'low']) if (tState.cars[key].hit) tState.cars[key] = tBody();
+    const t = (performance.now() - tState.t0) / 1000, z = () => ({ LF: 0, RF: 0, LR: 0, RR: 0 });
+    tState.ev = { k, t0: t, m: { up: { maxD: z(), maxHop: z(), maxTh: 0 }, low: { maxD: z(), maxHop: z(), maxTh: 0 } } };
+    tButtons();
+  }
+  // 結果の文（赤＝動いた・当たった、緑＝止まっている）。段差は、ボディの上下とワイヤーとのちがいを必ず書く
+  function tJudge(key) {
+    const S = tState, B = S.cars[key], ev = S.ev, m = ev.m[key], sel = tSel[key];
+    if (B.hit) {
+      const turn = sel.size && sel.size < 3 && m.maxTh * 180 / Math.PI > 2 ? `${tNames([...sel])}を中心に車体が回って、` : '';
+      const msg = { cab: (turn ? '' : '前へ転がって、') + 'キャビンに当たった！', end: '道板の端（ゲート側）から落ちた（脱輪）！', front: (turn ? '' : '前へ転がって、') + 'キャビンの後ろの柱に当たった！',
+                    rear: (turn ? '' : '後ろへ転がって、') + 'リアゲートに当たった！', side: (turn ? '' : '横に滑って、') + (key === 'up' ? '道板から落ちた（脱輪）！' : 'フロアの端から落ちた（脱輪）！') }[B.hit.k];
+      return [turn + msg, true];
+    }
+    if (ev.k === 'bump') {
+      const hop = TWH.filter(k => m.maxHop[k] > .01);
+      const body = tWire[key] ? '（ボディの揺れはワイヤーで小さい）' : '（ボディは上下に揺れた）';
+      return [(hop.length === 4 ? '車ごと跳ねた！' : hop.length ? `${tNames(hop)}が跳ねた！` : 'タイヤは跳ねない') + body, hop.length > 0];
+    }
+    const moved = TWH.filter(k => m.maxD[k] > .04);   // ベルトとタイヤのたわみで数 cm 動くのは「止まっている」
+    if (!moved.length) return ['ほとんど動かない（固縛が効いている）', false];
+    if (!sel.size) return [{ brake: '前へ転がった！', accel: '後ろへ転がった！', curve: '横に滑った！' }[ev.k], true];
+    if (moved.every(k => k[1] === 'R')) return ['車の後ろ側が' + (ev.k === 'curve' ? '横に' : '') + '振られた！', true];
+    if (moved.every(k => k[1] === 'F')) return ['車の前側が' + (ev.k === 'curve' ? '横に' : '') + '振られた！', true];
+    if (m.maxTh * 180 / Math.PI > 2) return [`${tNames([...sel])}を中心に、車体が回るように振られた！`, true];
+    return [`${tNames(moved)}が動いた！`, true];
+  }
+  // 選んだかけ方の説明（ページの本文。いま開いているタブの車。ワイヤーとのちがいも必ず書く）
+  function tNoteHtml() {
+    const key = tTab === 'low' && tLowOn ? 'low' : 'up', sel = tSel[key], has = k => sel.has(k), n = sel.size;
+    const who = key === 'up' ? '上段（プロボックス）' : '下段（レクサス IS）';
+    let m;
+    if (!n) m = '<b>固縛なし</b>：急ブレーキで前へ、急加速で後ろへ転がり、カーブで横に滑ります。段差では車ごと跳ねます。';
+    else if (n === 1) { const k = [...sel][0]; m = `<b>${TNAME[k]}だけ</b>：その車輪は動きませんが、ほかの車輪が動くので、${TNAME[k]}を中心に車体が回るように振られます。`; }
+    else if (n === 2) {
+      if ((has('LF') && has('RR')) || (has('RF') && has('LR'))) m = '<b>対角 2 輪</b>：前後左右の滑りはほぼ止まります。締める向きは対角で逆にします。';
+      else if (has('LF') && has('RF')) m = '<b>前 2 輪だけ</b>：前後には止まりますが、カーブで車の後ろ側が横に振られます。';
+      else if (has('LR') && has('RR')) m = '<b>後ろ 2 輪だけ</b>：前後には止まりますが、カーブで車の前側が横に振られます。';
+      else m = '<b>片側 2 輪だけ</b>：前後には止まりますが、反対側が少し振られます。';
+    } else if (n === 3) m = '<b>3 輪</b>：ほとんど動きません。';
+    else m = '<b>4 輪</b>：いちばん安定します。';
+    const sub = tWire[key]
+      ? 'ワイヤー（車体を引くので上下に強い）も掛けたので、段差でのボディの上下も小さくなります。'
+      : 'タイヤ固縛はタイヤを止めるだけで、ボディの上下は押さえません（上下に強いのは車体を引くワイヤー）。その代わり車体を傷つけにくく、サスペンションが動いても緩みにくい。跳ねるのが怖いときはワイヤーもプラス。';
+    return `${who}・${m}<span class="sub">${sub}</span>`;
+  }
+  function tRender(t) {
+    const S = tState, ev = S.ev;
+    // 文
+    setPhrased(document.getElementById('tWhy'), ev ? { brake: '急ブレーキ（時速 60 km から）', accel: '急加速', curve: '左カーブ（車は外側へ押される）', bump: '段差（5 cm）：タイヤ固縛はサスペンションから上のボディを押さえない' }[ev.k] : '「走る」のボタンで試せます（車のシフトはニュートラル）');
+    const r1 = document.getElementById('tRes'), r2 = document.getElementById('tRes2');
+    const line = key => {
+      if (ev && t - ev.t0 > .4) return tJudge(key);
+      return [(tSel[key].size ? tNames(TWH.filter(k => tSel[key].has(k))) + 'を固縛' : '固縛なし') + (tWire[key] ? '＋ワイヤー' : ''), false];
+    };
+    const [m1, b1] = line('up'); setPhrased(r1, (tLowOn ? '上段：' : '') + m1); r1.classList.toggle('bad', b1);
+    if (tLowOn) { const [m2, b2] = line('low'); setPhrased(r2, '下段：' + m2); r2.classList.toggle('bad', b2); } else r2.textContent = '';
+    if (tView === 'top') tDrawTop(); else tDrawSide();
+  }
+  // ── 上から見た図：真上の図のトラックに 2 台（下段→上段の道板→上段の順に重ねる）。車輪・固縛・ワイヤーは見えるように上に重ねる ──
+  function tPose(key) { const P = TCARS[key], B = tState.cars[key]; return { c: TP(P.rest.x + B.x, P.rest.y + B.y), deg: B.th * 180 / Math.PI, cs: Math.cos(B.th), sn: Math.sin(B.th) }; }
+  function tDrawTop(top = document.getElementById('tTop')) {
+    const S = tState, acc = css('--accent'), bad = css('--danger'), muted = css('--muted'), wire = css('--wire');
+    top.textContent = ''; tapTargets.set(top, []);
+    el('image', { href: TOP_TRUCK, x: 0, y: 0, width: 1418, height: 517 }, top);
+    if (top.id !== 'zoomSvg') {   // 拡大の中では図の説明の文字は描かない
+      for (const [x, a, s2] of [[110, 'start', '← キャビン側（前）'], [1350, 'end', 'ゲート側 →']]) { const e = el('text', { x, y: 96, 'text-anchor': a, 'font-size': 40, 'font-weight': 800, fill: muted }, top); e.textContent = s2; }
+      { const e = el('text', { x: 720, y: 498, 'text-anchor': 'middle', 'font-size': 32, 'font-weight': 700, fill: muted }, top); e.textContent = '上から見た図（図の下が助手席側）'; }
+    }
+    const carImg = key => { const P = TCARS[key], p = tPose(key), [img, x0, y0, w, h] = P.img; const g = el('g', { transform: `translate(${p.c.x.toFixed(1)},${p.c.y.toFixed(1)}) rotate(${p.deg.toFixed(2)})` }, top); el('image', { href: img, x: -w / 2, y: -h / 2, width: w, height: h }, g); };
+    if (tLowOn) carImg('low');
+    el('image', { href: TOP_RAMPS, x: 0, y: 0, width: 1418, height: 517 }, top);
+    carImg('up');
+    for (const key of tKeys()) {
+      const P = TCARS[key], B = S.cars[key], p = tPose(key);
+      // ワイヤー（車体の 4 か所からフロアへ。フロアのフックは動かない）
+      if (tWire[key]) for (const [sx, sy] of [[-1, 1], [-1, -1], [1, 1], [1, -1]]) {
+        const lx = sx * (P.hl - .45), ly = sy * (P.hw - .07), h = TP(P.rest.x + sx * (P.hl - .05), P.rest.y + sy * (P.hw + .15));
+        el('line', { x1: p.c.x + (lx * p.cs - ly * p.sn) * TPX, y1: p.c.y + (lx * p.sn + ly * p.cs) * TPX, x2: h.x, y2: h.y, stroke: wire, 'stroke-width': 7, 'stroke-linecap': 'round' }, top);
+        el('circle', { cx: h.x, cy: h.y, r: 7, fill: wire }, top);
+      }
+      // 車輪は車体の下（下段の前は上段の道板の下）に隠れているので、場所が分かるように重ねて描く
+      const wg = el('g', { transform: `translate(${p.c.x.toFixed(1)},${p.c.y.toFixed(1)}) rotate(${p.deg.toFixed(2)})` }, top);
+      for (const k of TWH) { const [lx, ly] = twp(P, k); el('rect', { x: lx * TPX - 40, y: ly * TPX - 14, width: 80, height: 28, rx: 8, fill: TC.tire, opacity: .85, stroke: '#FFFFFF', 'stroke-width': 2 }, wg); }
+      // 固縛した車輪：Ω のベルト（上から見ると、タイヤの上を前後に通る帯）と、ラチェット。締める向きは内向き（キャビン側の車輪はゲート側へ、ゲート側の車輪はキャビン側へ）
+      for (const k of TWH) if (tSel[key].has(k)) {
+        const [lx, ly] = twp(P, k), d = lx < 0 ? 1 : -1;
+        const q = tWheel(P, B, k), w = TP(P.rest.x + lx + q.x, P.rest.y + ly + q.y), a = TP(P.rest.x + lx, P.rest.y + ly);
+        el('path', { d: `M${a.x - d * 88},${a.y} L${w.x},${w.y} L${a.x + d * 177},${a.y}`, fill: 'none', stroke: TC.belt, 'stroke-width': 12, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, top);
+        el('rect', { x: a.x + d * 140 - 14, y: a.y - 10, width: 28, height: 20, rx: 4, fill: TC.metal, stroke: TC.metalD, 'stroke-width': 2 }, top);
+        for (const hx of [a.x - d * 88, a.x - 23, a.x + 23, a.x + d * 177]) el('circle', { cx: hx, cy: a.y, r: 6, fill: TC.metalD }, top);
+        el('circle', { cx: w.x, cy: w.y, r: 50, fill: 'none', stroke: acc, 'stroke-width': 6, 'stroke-dasharray': '13 9' }, top);
+        zoomTap(top, w.x, w.y, 56, `${P.name}・${TNAME[k]}の固縛`, 'top', w.x + d * 50, (w.y + p.c.y) / 2);
+      }
+      const tag = el('text', { x: p.c.x, y: p.c.y + 12, 'text-anchor': 'middle', 'font-size': 34, 'font-weight': 900, fill: '#141A12', stroke: '#FFFFFF', 'stroke-width': 8, 'paint-order': 'stroke', 'stroke-linejoin': 'round' }, top); tag.textContent = P.name;
+      if (B.hit) { const h = TP(B.hit.x, B.hit.y); el('circle', { cx: h.x, cy: h.y, r: 44, fill: 'none', stroke: bad, 'stroke-width': 10 }, top); }
+    }
+  }
+  // ── 横から見た図：手順と同じトラックの側面図（緊締を試すと同じ高さ）に 2 台。ボディとタイヤを分けて動かし、見えている側の固縛を描く ──
+  function tDrawSide(target = document.getElementById('tSide')) {
+    const S = tState, keep = cur, keepW = lastWheels, prevP = carP;
+    const lift = key => { const B = S.cars[key]; return (TWH.reduce((a, k) => a + B.hop[k][0], 0) / 4 + B.bz) * PXM * T_GAIN; };
+    tSideOn = {};
+    for (const key of tKeys()) tSideOn[key] = { lift: lift(key), hops: TSIDE_KEYS[key].map(k => S.cars[key].hop[k][0] * PXM * T_GAIN) };
+    cur = { ...base, pto: 1, up: 1, pin: 1, upF: simF, upR: simR, low: tLowOn ? 1 : 0, slidePx: S.cars.up.x * PXM, slidePx2: tLowOn ? S.cars.low.x * PXM : 0 };
+    carP = { up: 1, low: 1 };
+    renderTarget = target;
+    try { render(); } finally { renderTarget = null; tSideOn = null; cur = keep; lastWheels = keepW; carP = prevP; }
+  }
+  // 横から見た図に、見えている側の車輪のタイヤ固縛と、ワイヤー（車体）を描く（render の中から呼ぶ）
+  function tireSideMarks(svg, g, upCar, lowCar) {
+    for (const [key, carObj, ft, off] of [['up', upCar, 9, -5], ['low', lowCar, 11, 4]]) {
+      if (!carObj) continue;
+      const ws = carObj.wheels.slice().sort((a, b) => a.x - b.x);
+      ws.forEach((w, i) => { const k = TSIDE_KEYS[key][i]; if (tSel[key].has(k)) { tireStrap(svg, w, carObj.rPx, carObj.ang, i === 0 ? 1 : -1, { ft, floor: carObj.rPx + off }); zoomTap(svg, w.x, w.y, 42, `${TCARS[key].name}・${TNAME[k]}の固縛`, 'side', w.x + (i === 0 ? 1 : -1) * carObj.rPx * 1.1); } });
+      if (tWire[key]) wires(svg, carObj.hooks, key === 'up' ? (x => onDeck(g, clamp((x - g.deck.x1) / (g.deck.x2 - g.deck.x1), 0, 1))) : (x => ({ x, y: lowerFloorY(x, g) })), HOOK.down, HOOK.down);
+    }
+  }
+  function tSetView(v) {
+    tView = v; closeZoom();
+    document.getElementById('tTop').toggleAttribute('hidden', v !== 'top'); document.getElementById('tSide').toggleAttribute('hidden', v !== 'side');   // SVG は .hidden が効かないので属性で
+    for (const [id, k] of [['tViewSide', 'side'], ['tViewTop', 'top']]) document.getElementById(id).setAttribute('aria-pressed', v === k ? 'true' : 'false');
+  }
+  function tChips() {
+    for (const [key, id] of [['up', 'tWheelsUp'], ['low', 'tWheelsLow']]) {
+      const box = document.getElementById(id), sel = tSel[key];
+      const mark = () => [...box.children].forEach((b, i) => { const k = [...TWH, 'none'][i]; b.setAttribute('aria-pressed', (k === 'none' ? !sel.size : sel.has(k)) ? 'true' : 'false'); });
+      for (const k of [...TWH, 'none']) {
+        const b = document.createElement('button'); b.className = 'chip'; b.type = 'button'; b.textContent = k === 'none' ? 'なし' : TNAME[k];
+        b.onclick = () => { if (k === 'none') sel.clear(); else if (sel.has(k)) sel.delete(k); else sel.add(k); mark(); tTouched(); };
+        box.appendChild(b);
+      }
+      mark();
+    }
+    for (const [key, id] of [['up', 'tWireUp'], ['low', 'tWireLow']]) { const wb = document.getElementById(id); wb.onclick = () => { tWire[key] = !tWire[key]; wb.setAttribute('aria-pressed', tWire[key] ? 'true' : 'false'); tTouched(); }; }
+    const lt = document.getElementById('tLowToggle');
+    const showLow = () => { lt.setAttribute('aria-pressed', tLowOn ? 'true' : 'false'); lt.textContent = tLowOn ? '下段の車を下ろす' : '下段に車を積む'; for (const r of document.querySelectorAll('.tlowrow')) r.hidden = !tLowOn; };
+    lt.onclick = () => { tLowOn = !tLowOn; if (tState) tState.cars.low = tBody(); showLow(); tTouched(); };
+    showLow();
+    // 上段・下段のタブ：押すか、左右にスワイプして切りかえる（緊締を試すと同じ）
+    { const pages = document.getElementById('tLpages'), tabs = [document.getElementById('tLtabUp'), document.getElementById('tLtabLow')];
+      const mark = i => { tabs.forEach((t, k) => t.setAttribute('aria-selected', k === i ? 'true' : 'false')); const nt = i ? 'low' : 'up'; if (nt !== tTab) { tTab = nt; tNote(); } };
+      tabs.forEach((t, i) => t.onclick = () => { pages.scrollTo({ left: i * pages.clientWidth, behavior: 'smooth' }); mark(i); });
+      pages.addEventListener('scroll', () => mark(Math.round(pages.scrollLeft / Math.max(1, pages.clientWidth)))); }
+    document.getElementById('tViewSide').onclick = () => tSetView('side');
+    document.getElementById('tViewTop').onclick = () => tSetView('top');
+    tSetView(tView);
+    for (const [id, k] of [['tBrake', 'brake'], ['tAccel', 'accel'], ['tCurve', 'curve'], ['tBump', 'bump']]) document.getElementById(id).onclick = () => tEvent(k);
+    document.getElementById('tAgain').onclick = tStart;
+    document.getElementById('tExplain').onclick = openTireExplain;
+    document.getElementById('tToWire').onclick = () => setMode('sim');
+    document.getElementById('simToTire').onclick = () => setMode('tire');
+    tNote();
+  }
+  function tNote() { document.getElementById('tNote').innerHTML = tNoteHtml(); }
+  // かけ方を変えたら、終わった試しの結果は消して、いまのかけ方の説明に
+  function tTouched() { tNote(); if (tState && tState.ev && tState.ev.done) tState.ev = null; }
+  tChips();
+
+  // ── 緊締を試す：上から見た図（見る＝上から）。真上の図のトラックに 2 台、選んだ緊締のワイヤーの向きも描く ──
+  let simTop = false;
+  const SIM_VB = { side: '0 205 1480 607', top: '60 50 1320 460' };
+  function drawSimTop(svg) {
+    const st = simState, C = { muted: css('--muted'), wire: css('--wire'), bad: css('--danger') };
+    el('image', { href: TOP_TRUCK, x: 0, y: 0, width: 1418, height: 517 }, svg);
+    if (svg.id !== 'zoomSvg') {   // 拡大の中では図の説明の文字は描かない
+      for (const [x, a, s2] of [[110, 'start', '← キャビン側（前）'], [1350, 'end', 'ゲート側 →']]) { const e = el('text', { x, y: 96, 'text-anchor': a, 'font-size': 40, 'font-weight': 800, fill: C.muted }, svg); e.textContent = s2; }
+      { const e = el('text', { x: 720, y: 498, 'text-anchor': 'middle', 'font-size': 32, 'font-weight': 700, fill: C.muted }, svg); e.textContent = '上から見た図（図の下が助手席側。ずれは実寸）'; }
+    }
+    if (!st) return;
+    // 車のずれ：前後は b.x（キャビン側が＋）、横は両端（キャビン側の端 c・ゲート側の端 g、外側＝図の上が＋）
+    const pose = (key, b) => { const P = TCARS[key], dy = -(b.lat.c + b.lat.g) / 2, th = Math.atan2(b.lat.c - b.lat.g, P.hl * 2); return { P, c: TP(P.rest.x - b.x, P.rest.y + dy), th, cs: Math.cos(th), sn: Math.sin(th) }; };
+    const draw = (key, b) => { const p = pose(key, b), [img, , , w, h] = p.P.img; const g = el('g', { transform: `translate(${p.c.x.toFixed(1)},${p.c.y.toFixed(1)}) rotate(${(p.th * 180 / Math.PI).toFixed(2)})` }, svg); el('image', { href: img, x: -w / 2, y: -h / 2, width: w, height: h }, g); };
+    if (lowOn) draw('low', st.low);
+    el('image', { href: TOP_RAMPS, x: 0, y: 0, width: 1418, height: 517 }, svg);
+    draw('up', st.up);
+    // ワイヤー：車の 4 か所（キャビン側・ゲート側の左右）のフックから、選んだ向きのフロアの 2 か所へ（真下＝前後に開く、前引＝キャビン側へ、後ろ引＝ゲート側へ）
+    for (const [key, b, ks] of [['up', st.up, [lash.F, lash.R]], ['low', lowOn ? st.low : null, [lash.LF, lash.LR]]]) {
+      if (!b) continue;
+      const p = pose(key, b);
+      ks.forEach((k, e) => {
+        for (const sy of [-1, 1]) {
+          const lx = (e ? 1 : -1) * (p.P.wb / 2 - .35), ly = sy * (p.P.hw - .15);
+          const hk = { x: p.c.x + (lx * p.cs - ly * p.sn) * TPX, y: p.c.y + (lx * p.sn + ly * p.cs) * TPX };
+          for (const off of HOOK[k]) {
+            const a = TP(p.P.rest.x + lx + off / PXM, p.P.rest.y + sy * (p.P.hw + .1));
+            el('line', { x1: hk.x, y1: hk.y, x2: a.x, y2: a.y, stroke: C.wire, 'stroke-width': 6, 'stroke-linecap': 'round' }, svg);
+            el('circle', { cx: a.x, cy: a.y, r: 7, fill: C.wire }, svg);
+          }
+          if (k !== 'none') zoomTap(svg, hk.x, hk.y, 48, `${TCARS[key].name}・${e ? 'ゲート' : 'キャビン'}側の緊締`, 'top', hk.x, (hk.y + p.c.y) / 2);
+        }
+      });
+      const tag = el('text', { x: p.c.x, y: p.c.y + 12, 'text-anchor': 'middle', 'font-size': 34, 'font-weight': 900, fill: '#141A12', stroke: '#FFFFFF', 'stroke-width': 8, 'paint-order': 'stroke', 'stroke-linejoin': 'round' }, svg); tag.textContent = TCARS[key].name;
+      if (b.hit) el('circle', { cx: p.c.x + (b.hit === 'gate' || b.hit === 'derail' ? 1 : -1) * p.P.hl * TPX, cy: p.c.y, r: 46, fill: 'none', stroke: C.bad, 'stroke-width': 10 }, svg);
+    }
+  }
+  function setSimView(v) {
+    simTop = v === 'top'; closeZoom();
+    for (const [id, k] of [['simViewSide', 'side'], ['simViewTop', 'top']]) document.getElementById(id).setAttribute('aria-pressed', v === k ? 'true' : 'false');
+    if (simMode) document.getElementById('truck').setAttribute('viewBox', SIM_VB[v]);
+  }
+  document.getElementById('simViewSide').onclick = () => setSimView('side');
+  document.getElementById('simViewTop').onclick = () => setSimView('top');
+  setSimView('side');
+
   go(0);
 
   // ── 下に続きがあるときの知らせ ──
   const more = document.getElementById('more');
   function updateMore() {
     const card = document.getElementById('card');
-    const hidden = document.body.classList.contains('simmode') || card.hidden || card.getBoundingClientRect().bottom <= innerHeight - 8;
+    const hidden = document.body.classList.contains('simmode') || document.body.classList.contains('tiremode') || card.hidden || card.getBoundingClientRect().bottom <= innerHeight - 8;
     more.hidden = hidden;
   }
   more.onclick = () => { const r = document.getElementById('card').getBoundingClientRect(); scrollBy({ top: r.bottom - innerHeight + 24, behavior: reduce ? 'auto' : 'smooth' }); };
@@ -1167,13 +2029,21 @@ for (const u of [BASE_IMG, PROBOX_IMG, IS_IMG]) { const im = new Image(); im.src
   updateMore();
   // 手順と「緊締を試す」の切り替え（上下に並べると見にくいので別の画面に）
   function setMode(m) {
-    const simOn = m === 'sim';
+    const simOn = m === 'sim', tireOn = m === 'tire';
     simMode = simOn;
-    document.getElementById('modeSteps').setAttribute('aria-selected', simOn ? 'false' : 'true');
+    closeZoom(); closeTireExplain();
+    document.getElementById('modeSteps').setAttribute('aria-selected', m === 'steps' ? 'true' : 'false');
     document.getElementById('modeSim').setAttribute('aria-selected', simOn ? 'true' : 'false');
+    document.getElementById('modeTire').setAttribute('aria-selected', tireOn ? 'true' : 'false');
+    for (const id of ['tireSim', 'tireControls']) document.getElementById(id).hidden = !tireOn;
+    document.body.classList.toggle('tiremode', tireOn);
+    if (tireOn) { cancelAnimationFrame(simAnim); simState = null; simView = null; document.getElementById('simControls').hidden = true; document.body.classList.remove('simmode'); tStart(); }
+    else tStop();
+    if (tireOn) { if (!document.body.classList.contains('fixedpage')) { try { localStorage.setItem('nimotsu.mode', m); } catch (e) {} } return; }
     for (const id of ['card', 'tabs']) document.getElementById(id).hidden = simOn;
     document.getElementById('simMsg').hidden = !simOn;
-    document.getElementById('truck').setAttribute('viewBox', simOn ? '0 205 1480 607' : '0 110 2000 702');
+    document.getElementById('simViewSw').hidden = !simOn;
+    document.getElementById('truck').setAttribute('viewBox', simOn ? SIM_VB[simTop ? 'top' : 'side'] : '0 110 2000 702');
     document.querySelector('.stage .progress').hidden = simOn;
     document.querySelector('.stage .nav').hidden = simOn;
     document.getElementById('simControls').hidden = !simOn;
@@ -1183,10 +2053,11 @@ for (const u of [BASE_IMG, PROBOX_IMG, IS_IMG]) { const im = new Image(); im.src
   }
   document.getElementById('modeSteps').onclick = () => setMode('steps');
   document.getElementById('modeSim').onclick = () => setMode('sim');
+  document.getElementById('modeTire').onclick = () => setMode('tire');
   // アプリに入れるときは、ページごとに決め打ち（<meta name="kyoei-page" content="steps|sim">）。切り替えと見出しは出さない
   const fixedPage = document.querySelector('meta[name="kyoei-page"]')?.content;
   if (fixedPage) { document.querySelector('.mode').hidden = true; document.body.classList.add('fixedpage'); setMode(fixedPage); }
-  else { try { if (localStorage.getItem('nimotsu.mode') === 'sim') setMode('sim'); } catch (e) {} }
+  else { try { const sm = localStorage.getItem('nimotsu.mode'); if (sm === 'sim' || sm === 'tire') setMode(sm); } catch (e) {} }
   // 縦スライダーは空いている高さいっぱいの長さに（下段の行が増えると短くなる）
   { const fit = () => { for (const id of ['simFront', 'simRear']) { const box = document.getElementById(id).parentElement; const h = box.getBoundingClientRect().height; if (h > 0) box.style.setProperty('--vlen', Math.round(h) + 'px'); } };
     try { const ro = new ResizeObserver(fit); for (const id of ['simFront', 'simRear']) ro.observe(document.getElementById(id).parentElement); } catch (e) {} addEventListener('resize', fit); setTimeout(fit, 50); }
